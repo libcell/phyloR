@@ -6,20 +6,18 @@ Depends:
     R (>= 4.1.0)
 Imports:
     e1071
-Author: Bo Li, Jingxin Tao, Youjin Hao 
-Maintainer: Bo Li <libcell@cqnu.edu.cn>, Jingxin Tao <taojingxin@cqnu.edu.cn>
-Description: This tool was originally developed to assess the performance of 
-    diverse approaches evaluation of cell fraction. 
-License: MIT + file LICENSE
+Author: Bo Li, Feifei Li, Youjin Hao 
+Maintainer: Bo Li <libcell@cqnu.edu.cn>, Feifei Li <834272937@qq.com>
+Description: This tool was originally developed to analyze the evolutionary datasets. 
+License: GNU v3 file LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: 
     rmarkdown,
     knitr,
-    testthat,
-    csSAM (>= 1.4)
-URL: https://github.com/peachone/deconvBench
-BugReports: https://github.com/peachone/deconvBench/issues
+    testthat
+URL: https://github.com/libcell/phyloR
+BugReports: https://github.com/libcell/phyloR/issues
 biocViews:
 VignetteBuilder: knitr
 RoxygenNote: 7.2.0
