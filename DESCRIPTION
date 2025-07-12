@@ -9,7 +9,7 @@ Imports:
 Author: Bo Li, Feifei Li, Youjin Hao 
 Maintainer: Bo Li <libcell@cqnu.edu.cn>, Feifei Li <834272937@qq.com>
 Description: This tool was originally developed to analyze the evolutionary datasets. 
-License: GNU v3 file LICENSE
+License: GPL-3.0 LICENSE
 Encoding: UTF-8
 LazyData: true
 Suggests: 
