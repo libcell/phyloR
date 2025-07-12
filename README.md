@@ -1,7 +1,7 @@
 
 <img src="man/figures/simpipe_logo.png" align="right" width = "158px" height="183px"/>
 
-# Simpipe provides the standard pipeline of estimating parameters from read data, simulating and evaluating simulated data.
+# phyloR: An R Package for Evolutionary Biology.
 
 The goal of simpipe is to establish a standard pipeline to estimating
 parameters from real datasets, simulating single-cell RNA-seq datasets
