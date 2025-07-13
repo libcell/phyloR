@@ -44,7 +44,7 @@ details, please refer to
 ## Contact
 
 If you have any question, please email to Hongrui Duo
-(<duohongrui@cqnu.edu.cn>) or raise an issue for that.
+(<libcell@cqnu.edu.cn>) or raise an issue for that.
 
 ## Citation
 
