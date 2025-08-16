@@ -1,5 +1,5 @@
 
-<img src="man/figures/simpipe_logo.png" align="right" width = "158px" height="183px"/>
+<img src="man/figures/phyloR_logo.png" align="right" width = "158px" height="183px"/>
 
 # phyloR: An Automated R Package for Sequence Retrievd and Phylogenetic Analysis in Ecological and Environment Genomics.
 
