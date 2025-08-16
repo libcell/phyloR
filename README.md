@@ -1,5 +1,5 @@
 
-<img src="man/figures/phyloR_logo.png" align="right" width = "79px" height="91px"/>
+<img src="man/figures/phyloR_logo.png" align="right" width = "158px" height="183px"/>
 
 # phyloR: An Automated R Package for Sequence Retrievd and Phylogenetic Analysis in Ecological and Environment Genomics.
 
@@ -18,12 +18,24 @@ You can install the development version of simpipe from
 devtools::install_github("libcell/phyloR")
 ```
 
-if you want to use simpipe to simulate datasets with **trajectory
-information**, please install **tislingshot** first by:
+Or, you also can use **install.packages()** to install our package with following R script under the Windows Operation System: 
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("dynverse/ti_slingshot/package/")
+install.packages(
+  "https://www.ciblab.net/pub/pkg/phyloR_0.1.0.zip",
+  repos = NULL,       # 不去CRAN，而是直接用给定URL
+  type = "win.binary" # 指定为Windows二进制包
+)
+```
+
+Alternatively, you can use **install.packages()** to install it under the MacOS or Linux environment: 
+
+``` r
+install.packages(
+  "https://www.ciblab.net/pub/pkg/phyloR_0.1.0.tar.gz",
+  repos = NULL,
+  type = "source"
+)
 ```
 
 ## Usage
