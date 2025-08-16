@@ -23,8 +23,8 @@ Or, you also can use **install.packages()** to install our package with followin
 ``` r
 install.packages(
   "https://www.ciblab.net/pub/pkg/phyloR_0.1.0.zip",
-  repos = NULL,       # 不去CRAN，而是直接用给定URL
-  type = "win.binary" # 指定为Windows二进制包
+  repos = NULL,
+  type = "win.binary"
 )
 ```
 
