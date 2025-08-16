@@ -1,7 +1,7 @@
 
 <img src="man/figures/phyloR_logo.png" align="right" width = "158px" height="183px"/>
 
-# phyloR: An Automated R Package for Sequence Retrievd and Phylogenetic Analysis in Ecological and Environment Genomics.
+# phyloR: An R Package for Sequence Retrievd and Phylogenetic Analysis in Ecological and Environment Genomics.
 
 The goal of simpipe is to establish a standard pipeline to estimating
 parameters from real datasets, simulating single-cell RNA-seq datasets
