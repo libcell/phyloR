@@ -38,6 +38,37 @@ install.packages(
 )
 ```
 
+``` r
+install_phyloR <- function(
+  url = "https://www.ciblab.net/pub/pkg/phyloR_0.1.0.zip",
+  upgrade = "never"   # 不强制升级用户现有包
+){
+  # 1) 配好仓库（含 Bioc）
+  if (!requireNamespace("BiocManager", quietly = TRUE)) {
+    install.packages("BiocManager", repos = "https://cloud.r-project.org")
+  }
+  options(repos = BiocManager::repositories())  # CRAN + Bioc 全部可用
+
+  # 2) 安装 remotes
+  if (!requireNamespace("remotes", quietly = TRUE)) {
+    install.packages("remotes")
+  }
+
+  # 3) 从 URL 安装，并自动装依赖（Imports/Depends/Suggests[可控]）
+  remotes::install_url(
+    url,
+    dependencies = TRUE,     # 自动装 Imports/Depends；Suggests 也会装（可设 c("Depends","Imports")）
+    upgrade = upgrade
+  )
+
+  message("Done. Try: library(phyloR)")
+}
+
+install_phyloR()
+```
+
+
+
 ## Usage
 
 The documentation of simpipe is availabel at our
