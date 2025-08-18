@@ -72,4 +72,4 @@ If you have any question, please email to Feifei Li (<libcell@cqnu.edu.cn>) or r
 
 ## Citation
 - If you use phyloR in your research, please cite:
-\nZou Y, Zhang Z, Zeng Y, *et al*. Common methods for phylogenetic tree construction and their implementation in R. ***Bioengineering***, 2024, 11(5): 480.
+  Zou Y, Zhang Z, Zeng Y, *et al*. Common methods for phylogenetic tree construction and their implementation in R. ***Bioengineering***, 2024, 11(5): 480.
