@@ -7,7 +7,15 @@
 [![License: GPL-3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
 
-PhyloR is an R package used to obtain orthologs and sequences, including sequence alignment and trimming, to construct phylogenetic or species trees, and even to compare different trees.
+## Phylogenetic Analysis Toolkit for R
+
+**phyloR** provides an integrated workflow for molecular phylogenetics, from sequence retrieval to tree comparison. Key features include:
+
+- [DNA] Ortholog identification from major databases
+- [Search] Multiple sequence alignment and trimming
+- [Tree] Phylogenetic tree construction (ML/NJ/MP)
+- <-> Tree comparison and visualization
+- [Plot] Integrated tidyverse compatibility
 
 ## Installation
 
