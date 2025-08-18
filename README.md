@@ -3,7 +3,7 @@
 
 # phyloR: An Automated R Package for Sequence Retrievd and Phylogenetic Analysis in Ecological and Environment Genomics.
 
-[![R-CMD-check](https://github.com/libcell/phyloR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/libcell/phyloR/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/ciblab/phyloR/workflows/R-CMD-check/badge.svg)](https://github.com/ciblab/phyloR/actions)
 [![License: GPL-3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
 
@@ -17,6 +17,21 @@
 - ↔️ Tree comparison and visualization
 - 📊 Integrated tidyverse compatibility
 
+
+
+---
+
+## ✨ Features
+
+- **Ortholog retrieval** from major databases (Ensembl, NCBI, UniProt, etc.)  
+- **Multiple sequence alignment** and **automated trimming**  
+- **Phylogenetic tree construction** using ML / NJ / MP algorithms  
+- **Tree comparison and visualization** with flexible output  
+- **Tidyverse-friendly interface** for downstream analysis and visualization  
+
+---
+
+
 ## Installation
 
 ### From GitHub (Latest Version)
@@ -24,9 +39,6 @@
 # Install via remotes (recommended), or devtools
 if (!require("remotes")) install.packages("remotes")
 remotes::install_github("libcell/phyloR", dependencies = TRUE)
-
-# For stable releases, specify version tag:
-# remotes::install_github("libcell/phyloR@v0.1.0")
 ```
 
 ### Alternatively, using **install_ciblab()** to install phyloR from our Labsite 
