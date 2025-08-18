@@ -11,11 +11,11 @@
 
 **phyloR** provides an integrated workflow for molecular phylogenetics, from sequence retrieval to tree comparison. Key features include:
 
-- 🧬 Ortholog identification from major databases
-- 🔍 Multiple sequence alignment and trimming
-- 🌳 Phylogenetic tree construction (ML/NJ/MP)
-- ↔️ Tree comparison and visualization
-- 📊 Integrated tidyverse compatibility
+\item [DNA] Ortholog identification from major databases
+\item [Search] Multiple sequence alignment and trimming
+\item [Tree] Phylogenetic tree construction (ML/NJ/MP)
+\item <-> Tree comparison and visualization
+\item [Plot] Integrated tidyverse compatibility
 
 ## Installation
 
