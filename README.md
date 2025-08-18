@@ -44,40 +44,71 @@ install_ciblab("phyloR")
 
 ### Examples
 ``` r
-library(phyloR)
+# Define specific gene and species 
+gene_id <- "K00826"
+species.list <- c("hsa", "sce", "dme", "cel",
+                  "xla", "gga", "ssc", "rno",
+                  "mmu", "mcc", "gmx", "bta",
+                  "ece", "zma", "osa", "ath")
 
-# Get orthologs
-taxinfo1 <- get_orthologs(gene_id = "K00161",
-                          id.type = "KO_id",
-                          species.list = "Homo sapiens",
-                          species.type = "scientificname")
+# Create a new directory for sequences files
+temp_dir <- tempdir()
+if (!dir.exists(temp_dir)) {
+  dir.create(temp_dir, recursive = TRUE)
+}
 
-# Build gene tree
-dna <- c("K01939", "K03644", "K00797", "K00927", "K00088", "K02257", "K00164",
-         "K00820", "K06158", "K00008")
-data_dir <- system.file("extdata", "sequences", package = "phyloR")
-tree1 <- coalescent_tree(seq.file = dna,
-                         seq.type = "protein",
-                         data_dir = data_dir,
-                         tree_method = "NJ",
-                         show_tree = TRUE)
 
-# Obtain species tree
-# Example 1:
-species1 <- c("Homo sapiens", "Pan troglodytes", "Mus musculus",
-              "Rattus norvegicus","Canis lupus familiaris", "Felis catus")
-tree1 <- species_tree(species = species1, species.type = "scientificname")
+# Retrieve orthologous gene information for the provided species
+species_info <- get_orthologs(gene_id = gene_id,
+                              id.type = "ko_id",
+                              species.list = species.list,
+                              species.type = "abbspname")
 
-# Example 2:
-species2 <- c("9606", "9598", "10090", "9615", "9685", "10116")
-tree2 <- species_tree(species = species2, species.type = "taxonomic_id")
 
-# Example 3:
-species3 = c("ath", "gmx", "zma", "osa",
-             "dme", "cel", "mmu", "rno",
-             "hsa", "mcc", "ssc", "bta",
-             "gga", "xla", "sce", "ece")
-tree3 <- species_tree(species = species3, species.type = "abbspname")
+# Process species names and get the KEGG IDs
+species <- tolower(species_info[, 3])
+gene_ids <- paste(species, species_info[, 1], sep = ":")
+
+
+# Retrieve sequences for KEGG IDs base on the sequence type
+seqset <- get_kegg_sequences(gene_ids = gene_ids,
+                          id.type = "kegg_id",
+                          seq.type = "DNA")
+
+# Write the sequences to a FASTA file
+names(seqset) <- spnames
+output_path <- file.path(temp_dir, "sequences.fasta")
+seqinr::write.fasta(seqset, names = names(seq), file.out = output_path)
+
+
+# Prepare output file path for processed sequences
+data_file <- paste(gene_id, "fasta", sep = ".")
+output_file <- file.path(temp_dir, data_file)
+
+
+# Align and trim the sequences using the selected alignment method
+processed_seq <- align_trim(seq.file = output_path,
+                            seq.type = "DNA",
+                            method = "ClustalW",
+                            output_file = output_file)
+
+# Construct a phylogenetic tree based on the processed sequences using the selected method
+tree <- gene_tree(seq.file = output_file,
+                  seq.type = "DNA",
+                  tree_method = "NJ",
+                  show_tree = TRUE)
+
+# Construct the gene tree using DNA sequences of K00826
+
+tree <- gene_tree_fetch(gene_id = "K00826",
+                        species.list = c("hsa", "sce", "dme", "cel",
+                                         "xla", "gga", "ssc", "rno",
+                                         "mmu", "mcc", "gmx", "bta",
+                                         "ece", "zma", "osa", "ath"),
+                        species.type = "abbspname",
+                        seq.type = "DNA",
+                        tree_method = "NJ",
+                        show_tree = TRUE)
 ```
 
 ### Detailed Guides
