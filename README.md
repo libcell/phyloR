@@ -57,6 +57,21 @@ plot_tree(tree) +
 ```
 
 
+### Detailed Guides
+| Topic                      | Command/Resource                  |
+|----------------------------|-----------------------------------|
+| [DNA] Ortholog Retrieval    | `vignette("orthologs")`           |
+| [ALIGN] Sequence Alignment  | `vignette("alignment-methods")`   |
+| /TREE\ Tree Construction   | `vignette("tree-building")`       |
+| <=> Tree Comparison        | `vignette("tree-comparison")`     |
+
+### Online Resources
+- [ [WEB] Website Docs ](https://libcell.github.io/phyloR/)
+- [ [PDF] User Manual ](docs/phyloR_manual.pdf)
+- [ [VID] Tutorial Videos ](https://youtube.com/playlist?list=XXX)
+
+### Cheatsheet
+
 
 ## Contact
 
