@@ -11,40 +11,52 @@
 
 **phyloR** provides an integrated workflow for molecular phylogenetics, from sequence retrieval to tree comparison. Key features include:
 
-\item [DNA] Ortholog identification from major databases
-\item [Search] Multiple sequence alignment and trimming
-\item [Tree] Phylogenetic tree construction (ML/NJ/MP)
-\item <-> Tree comparison and visualization
-\item [Plot] Integrated tidyverse compatibility
+- 🧬 Ortholog identification from major databases
+- 🔍 Multiple sequence alignment and trimming
+- 🌳 Phylogenetic tree construction (ML/NJ/MP)
+- ↔️ Tree comparison and visualization
+- 📊 Integrated tidyverse compatibility
 
 ## Installation
 
-You can install the development version of phyloR from
-[GitHub](https://github.com/) with:
-
+### From GitHub (Latest Version)
 ``` r
-# install.packages("devtools")
-devtools::install_github("libcell/phyloR")
+# Install via remotes (recommended), or devtools
+if (!require("remotes")) install.packages("remotes")
+remotes::install_github("libcell/phyloR", dependencies = TRUE)
+
+# For stable releases, specify version tag:
+# remotes::install_github("libcell/phyloR@v0.1.0")
 ```
 
-Alternatively, you can use **install_ciblab()** to install it under the MacOS or Linux environment: 
+### Alternatively, using **install_ciblab()** to install phyloR from our Labsite 
 
 ``` r
 source("https://ciblab.net/pub/install_ciblab.R")
 install_ciblab("phyloR")
 ```
 
-## Usage
+## Quick Start
 
-The documentation of phyloR is availabel at our
-[Simsite](http://www.ciblab.net/software/phyloR/). In addition, you can also learn the usage of every simulation methods we have collected.
+``` r
+library(phyloR)
 
-Users can also download our phyloR [Docker
-Image](https://hub.docker.com/repository/docker/duohongrui/simpipe/general)
-and use
-[**simpipe2docker**](https://github.com/duohongrui/simpipe2docker)
-package for linking R environmrnt and the Docker container. For more details, please refer to
-[Simsite](http://www.ciblab.net/software/Simsite/).
+# Get orthologs
+ortho <- get_orthologs(gene = "COX1", 
+                       species = c("human", "mouse", "zebrafish"))
+
+# Align sequences
+aln <- align_sequences(ortho, method = "mafft")
+
+# Build tree
+tree <- build_tree(aln, method = "RAxML")
+
+# Visualize
+plot_tree(tree) + 
+  ggtree::theme_tree2()
+```
+
+
 
 ## Contact
 
