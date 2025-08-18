@@ -33,7 +33,7 @@ if (!require("remotes")) install.packages("remotes")
 remotes::install_github("libcell/phyloR", dependencies = TRUE)
 ```
 
-### Alternatively, using **install_ciblab()** to install phyloR from our Labsite 
+### Alternatively, using **install_ciblab()** to install phyloR from CibLab repository 
 
 ``` r
 source("https://ciblab.net/pub/install_ciblab.R")
