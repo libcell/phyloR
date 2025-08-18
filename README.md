@@ -70,51 +70,17 @@ install_phyloR()
 Alternatively, you can use **install_ciblab()** to install it under the MacOS or Linux environment: 
 
 ``` r
-install.packages(
-  "https://www.ciblab.net/pub/pkg/phyloR_0.1.0.tar.gz",
-  repos = NULL,
-  type = "source"
-)
+source("https://ciblab.net/pub/install_ciblab.R")
+install_ciblab()
 ```
-
-``` r
-install_phyloR <- function(
-  url = "https://www.ciblab.net/pub/pkg/phyloR_0.1.0.zip",
-  upgrade = "never"   # 不强制升级用户现有包
-){
-  # 1) 配好仓库（含 Bioc）
-  if (!requireNamespace("BiocManager", quietly = TRUE)) {
-    install.packages("BiocManager", repos = "https://cloud.r-project.org")
-  }
-  options(repos = BiocManager::repositories())  # CRAN + Bioc 全部可用
-
-  # 2) 安装 remotes
-  if (!requireNamespace("remotes", quietly = TRUE)) {
-    install.packages("remotes")
-  }
-
-  # 3) 从 URL 安装，并自动装依赖（Imports/Depends/Suggests[可控]）
-  remotes::install_url(
-    url,
-    dependencies = TRUE,     # 自动装 Imports/Depends；Suggests 也会装（可设 c("Depends","Imports")）
-    upgrade = upgrade
-  )
-
-  message("Done. Try: library(phyloR)")
-}
-
-install_phyloR()
-```
-
-
 
 ## Usage
 
-The documentation of simpipe is availabel at our
-[Simsite](http://www.ciblab.net/software/Simsite/). In addition, you can
+The documentation of phyloR is availabel at our
+[Simsite](http://www.ciblab.net/software/phyloR/). In addition, you can
 also learn the usage of every simulation methods we have collected.
 
-Users can also download our simpipe [Docker
+Users can also download our phyloR [Docker
 Image](https://hub.docker.com/repository/docker/duohongrui/simpipe/general)
 and use
 [**simpipe2docker**](https://github.com/duohongrui/simpipe2docker)
@@ -129,7 +95,4 @@ If you have any question, please email to Hongrui Duo
 
 ## Citation
 
-Duo H, Li Y, Lan Y, *et al*. Systematic evaluation with practical
-guidelines for single-cell and spatially resolved transcriptomics data
-simulation under multiple scenarios. ***Genome Biology***, 2024, 25(1):
-145.
+Zou Y, Zhang Z, Zeng Y, *et al*. Common methods for phylogenetic tree construction and their implementation in R. ***Bioengineering***, 2024, 11(5): 480.
