@@ -77,21 +77,18 @@ install_ciblab()
 ## Usage
 
 The documentation of phyloR is availabel at our
-[Simsite](http://www.ciblab.net/software/phyloR/). In addition, you can
-also learn the usage of every simulation methods we have collected.
+[Simsite](http://www.ciblab.net/software/phyloR/). In addition, you can also learn the usage of every simulation methods we have collected.
 
 Users can also download our phyloR [Docker
 Image](https://hub.docker.com/repository/docker/duohongrui/simpipe/general)
 and use
 [**simpipe2docker**](https://github.com/duohongrui/simpipe2docker)
-package for linking R environmrnt and the Docker container. For more
-details, please refer to
+package for linking R environmrnt and the Docker container. For more details, please refer to
 [Simsite](http://www.ciblab.net/software/Simsite/).
 
 ## Contact
 
-If you have any question, please email to Hongrui Duo
-(<libcell@cqnu.edu.cn>) or raise an issue for that.
+If you have any question, please email to Feifei Li (<libcell@cqnu.edu.cn>) or raise an issue for that.
 
 ## Citation
 
