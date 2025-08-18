@@ -1,23 +1,41 @@
-Package: deconvBench
+Package: phyloR
 Type: Package
-Title: A tool for approaches evaluation of cell fraction estimation
+Title: A tool for getting the information of gene and constructing phylogenetic tree
 Version: 0.1.0
-Depends: 
-    R (>= 4.1.0)
-Imports:
-    e1071
-Author: Bo Li, Feifei Li, Youjin Hao 
-Maintainer: Bo Li <libcell@cqnu.edu.cn>, Feifei Li <834272937@qq.com>
-Description: This tool was originally developed to analyze the evolutionary datasets. 
-License: GPL-3.0 LICENSE
+Date: 2025-08-31
+Author: Bo Li <libcell@cqnu.edu.cn>, 
+        Feifei Li <834272937@qq.com>
+Maintainer: Bo Li <libcell@cqnu.edu.cn>,
+            Feifei Li <834272937@qq.com>
+Description: An Automated R package for sequence Retrieved and Phylogenetic 
+             Analysis in Ecological and Environmental Genomics.
+Depends: R (>= 3.5.0)
+Imports: KEGGREST,
+         ape, 
+         adegenet, 
+         phangorn, 
+         rentrez, 
+         taxize, 
+         babette, 
+         microseq, 
+         msa, 
+         pbapply,
+         Biostrings,
+         seqinr,
+         beastierinstall,
+         bios2mds,
+         remotes,
+         apex,
+         methods,
+         beautier,
+         beastier
+License: GPL-3
 Encoding: UTF-8
-LazyData: true
-Suggests: 
-    rmarkdown,
-    knitr,
-    testthat
-URL: https://github.com/libcell/phyloR
-BugReports: https://github.com/libcell/phyloR/issues
-biocViews:
+LazyData: TRUE
+Suggests: rmarkdown, testthat, knitr, crayon
+Remotes: richelbilderbeek/beastierinstall
+URL: http://github.com/Lifei-9/phyloR
+BugReports: http://github.com/Lifei-9/phyloR/issues
+Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
-RoxygenNote: 7.2.0
+RoxygenNote: 7.3.2
