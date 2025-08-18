@@ -47,18 +47,37 @@ install_ciblab("phyloR")
 library(phyloR)
 
 # Get orthologs
-ortho <- get_orthologs(gene = "COX1", 
-                       species = c("human", "mouse", "zebrafish"))
+taxinfo1 <- get_orthologs(gene_id = "K00161",
+                          id.type = "KO_id",
+                          species.list = "Homo sapiens",
+                          species.type = "scientificname")
 
-# Align sequences
-aln <- align_sequences(ortho, method = "mafft")
+# Build gene tree
+dna <- c("K01939", "K03644", "K00797", "K00927", "K00088", "K02257", "K00164",
+         "K00820", "K06158", "K00008")
+data_dir <- system.file("extdata", "sequences", package = "phyloR")
+tree1 <- coalescent_tree(seq.file = dna,
+                         seq.type = "protein",
+                         data_dir = data_dir,
+                         tree_method = "NJ",
+                         show_tree = TRUE)
 
-# Build tree
-tree <- build_tree(aln, method = "RAxML")
+# Obtain species tree
+# Example 1:
+species1 <- c("Homo sapiens", "Pan troglodytes", "Mus musculus",
+              "Rattus norvegicus","Canis lupus familiaris", "Felis catus")
+tree1 <- species_tree(species = species1, species.type = "scientificname")
 
-# Visualize
-plot_tree(tree) + 
-  ggtree::theme_tree2()
+# Example 2:
+species2 <- c("9606", "9598", "10090", "9615", "9685", "10116")
+tree2 <- species_tree(species = species2, species.type = "taxonomic_id")
+
+# Example 3:
+species3 = c("ath", "gmx", "zma", "osa",
+             "dme", "cel", "mmu", "rno",
+             "hsa", "mcc", "ssc", "bta",
+             "gga", "xla", "sce", "ece")
+tree3 <- species_tree(species = species3, species.type = "abbspname")
 ```
 
 ### Detailed Guides
