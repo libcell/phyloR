@@ -1,0 +1,29 @@
+---
+title: "phyloR"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{phyloR}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\vignetteCoding{UTF-8}
+---
+  
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+
+## Getting Started with phyloR
+
+This vignette demonstrates how to use phyloR for basic operations.
+
+### Installing phyloR
+
+You can install phyloR from GitHub.
+
+To install from GitHub:
+
+```{r install-github-devtools, eval=FALSE}
+devtools::install_github("libcell/phyloR")

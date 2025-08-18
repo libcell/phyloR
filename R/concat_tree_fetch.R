@@ -1,0 +1,137 @@
+#' Concatenate Phylogenetic Tree from Multiple Genes
+#'
+#' It fetches orthologous sequences for multiple gene IDs, performs alignment
+#' and trimming, and constructs a phylogenetic tree based on the concatenated sequences.
+#' It allows the selection of different sequence alignment and tree-building methods,
+#' and supports both DNA and protein sequences.
+#'
+#' @param gene_ids A character vector of gene IDs to be used for building the concatenate tree.
+#' @param id.type The type of gene ID used(e.g., KO_id, ncbi_id, or kegg_id), default is "KO_id" (KEGG Orthology ID).
+#' @param species.list A character vector specifying the species to be included in the analysis.
+#'        If NULL, all species available for each gene ID will be used.
+#' @param species.type The type of species identifier to be used, Options are "scientificname", "taxonomic_id", and "abbspname".
+#'        default is "scientificname".
+#' @param seq.type The type of sequence to be retrieved, default is "DNA".
+#'        Other options may include "protein".
+#' @param align_method The alignment method to be used, default is "ClustalW".
+#'        Options are "ClustalW", "Muscle", "Mafft" or "T-coffee". Default is "ClustalW".
+#' @param tree_method The method for constructing the phylogenetic tree. Options include:
+#'        "ML" (Maximum Likelihood), "NJ" (Neighbor Joining), "UPGMA", "MP" (Maximum Parsimony),
+#'        and "BI" (Bayesian Inference). Default is "ML".
+#' @param show_tree Logical, if TRUE the constructed tree is displayed using a suitable tree plotting method.
+#'        Default is TRUE.
+#'
+#' @return A phylogenetic tree object of class `phylo`, representing the tree constructed from the concatenated sequences.
+#'
+#' @details It performs the following steps:
+#'   1. Fetches orthologous sequences for each gene ID and species.
+#'   2. Aligns and trims the sequences using the slected alignment method.
+#'   3. Constructs a phylogenetic tree based on the concatenated sequences using the slected tree method.
+#'   4. Optionally displays the constructed tree.
+#'   5. Cleans up temporary files and restores the original working directory.
+#'
+#' @importFrom adegenet fasta2DNAbin
+#' @importFrom ape dist.dna dist.aa nj di2multi prop.clades as.DNAbin as.AAbin
+#' @importFrom phangorn as.phyDat modelTest pml_bb upgma pratchet acctran
+#' @importFrom methods new
+#' @importFrom apex concatenate
+#' @importFrom babette bbt_run_from_model
+#' @importFrom beautier create_inference_model
+#' @importFrom beastier create_beast2_options
+#' @importFrom beastierinstall install_beast2
+#' @importFrom seqinr write.fasta
+#'
+#' @examples
+#' tree <- concat_tree_fetch(gene_ids = c("K00820", "K00088", "K00927",
+#'                                        "K06158", "K00008","K00164",
+#'                                        "K00797", "K01939", "K02257",
+#'                                        "K03644"),
+#'                           id.type = "KO_id",
+#'                           species.list = c("ath", "gmx", "zma", "osa",
+#'                                            "dme", "cel", "mmu", "rno",
+#'                                            "hsa", "mcc", "ssc", "bta",
+#'                                            "gga", "xla", "sce", "ece"),
+#'                           species.type = "abbspname",
+#'                           seq.type = "DNA",
+#'                           tree_method = "UPGMA")
+#'
+#'
+#' @export
+concat_tree_fetch <- function(gene_ids,
+                              id.type = "KO_id",
+                              species.list = NULL,
+                              species.type = "scientificname",
+                              seq.type = "DNA",
+                              align_method = "ClustalW",
+                              tree_method = "NJ",
+                              show_tree = TRUE){
+
+  # Save the current working directory
+  old_dir <- getwd()
+
+  # Create a new directory for sequences files and set them as the working directory
+  dir.create("sequences")
+  setwd("sequences")
+
+  # Loop through each gene ID
+  for (i in 1:length(gene_ids)) {
+    species_info <- get_orthologs(gene_id = gene_ids[i],
+                                  id.type = id.type,
+                                  species.list = species.list,
+                                  species.type = species.type)
+
+    # Process the species names and get the KEGG IDs
+    species <- tolower(species_info[, 3])
+    ids <- paste(species, species_info[, 1], sep = ":")
+    find.species <- function(a) {which(species_tbl[, 3] == a)}
+    spnames <- NULL
+    for(s in 1:length(species)){
+      position <- as.vector(sapply(species[s], find.species))
+      if(length(position) == 0){
+        warning(paste(species[s], "No valid species found.", sep = ":"))
+        next
+      }
+      position <- position[1]
+      spe <- species_tbl[position, 4]
+      spnames <- c(spnames, spe)
+    }
+
+    # Retrieve sequences for KEGG IDs base on the sequence type
+    seq <- get_kegg_sequences(gene_ids = ids,
+                              id.type = "kegg_id",
+                              seq.type = seq.type)
+
+    # Process the sequences and write them to a FASTA file
+    names(seq) <- spnames
+    name.file <- paste(gene_ids[i], "seq.fasta", sep = "_")
+    file.out <- file.path(getwd(), name.file)
+    seqinr::write.fasta(seq, names = names(seq), file.out = file.out, nbchar = 60)
+
+    # Prepare the outfile path for the processed sequences
+    data_file <- paste(gene_ids[i], "fas", sep = ".")
+    output_path <- file.path(getwd(), data_file)
+
+    # Align and trim the sequences using the selected alignment method
+    processed_seq <- align_trim(seq.file = file.out,
+                                seq.type = seq.type,
+                                method = align_method,
+                                output_file = output_path)
+
+    # Remove the temporary sequences file
+    file.remove(file.out)
+
+  }
+  # Return to the original working directory
+  setwd(old_dir)
+
+  # Prepare the sequence file for tree construction
+  seq.file <- as.vector(gene_ids)
+
+  # Construct a phylogenetic tree based on the processed sequences using the selected method
+  tree <- concat_tree(seq.file,
+                      seq.type = seq.type,
+                      data_dir = "./sequences/",
+                      tree_method = tree_method,
+                      show_tree = show_tree)
+  unlink("sequences", recursive = TRUE)
+}
