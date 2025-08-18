@@ -3,6 +3,10 @@
 
 # phyloR: An Automated R Package for Sequence Retrievd and Phylogenetic Analysis in Ecological and Environment Genomics.
 
+[![R-CMD-check](https://github.com/libcell/phyloR/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/libcell/phyloR/actions/workflows/R-CMD-check.yaml)
+[![License: GPL-3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+
 PhyloR is an R package used to obtain orthologs and sequences, including sequence alignment and trimming, to construct phylogenetic or species trees, and even to compare different trees.
 
 ## Installation
