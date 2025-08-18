@@ -71,6 +71,6 @@ plot_tree(tree) +
 If you have any question, please email to Feifei Li (<libcell@cqnu.edu.cn>) or raise an issue for that.
 
 ## Citation
-- If you use phyloR in your research, please cite:
- 
-  Zou Y, Zhang Z, Zeng Y, *et al*. Common methods for phylogenetic tree construction and their implementation in R. ***Bioengineering***, 2024, 11(5): 480. 
+If you use phyloR in your research, please cite:
+
+Zou Y, Zhang Z, Zeng Y, *et al*. Common methods for phylogenetic tree construction and their implementation in R. ***Bioengineering***, 2024, 11(5): 480. 
