@@ -20,17 +20,11 @@
 
 ### Platform Requirements
 
-- Windows users:
+- *for Windows users:* Please ensure that Rtools is installed and properly configured before installing from source.
 
-Please ensure that Rtools is installed and properly configured before installing from source.
+- *for MacOS users:* Some dependencies (e.g., rgl) require XQuartz to be installed.
 
-- MacOS users:
-
-Some dependencies (e.g., rgl) require XQuartz to be installed.
-
-- Linux users:
-
-Make sure to install system libraries required by Bioconductor packages (e.g., libxml2, libcurl, libssl).
+- *for Linux users:* Make sure to install system libraries required by Bioconductor packages (e.g., libxml2, libcurl, libssl).
 
 ### From GitHub (Latest Version)
 ``` r
