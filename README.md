@@ -57,18 +57,15 @@ if (!dir.exists(temp_dir)) {
   dir.create(temp_dir, recursive = TRUE)
 }
 
-
 # Retrieve orthologous gene information for the provided species
 species_info <- get_orthologs(gene_id = gene_id,
                               id.type = "ko_id",
                               species.list = species.list,
                               species.type = "abbspname")
 
-
 # Process species names and get the KEGG IDs
 species <- tolower(species_info[, 3])
 gene_ids <- paste(species, species_info[, 1], sep = ":")
-
 
 # Retrieve sequences for KEGG IDs base on the sequence type
 seqset <- get_kegg_sequences(gene_ids = gene_ids,
@@ -79,7 +76,6 @@ seqset <- get_kegg_sequences(gene_ids = gene_ids,
 names(seqset) <- spnames
 output_path <- file.path(temp_dir, "sequences.fasta")
 seqinr::write.fasta(seqset, names = names(seq), file.out = output_path)
-
 
 # Prepare output file path for processed sequences
 data_file <- paste(gene_id, "fasta", sep = ".")
