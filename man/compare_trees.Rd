@@ -7,34 +7,43 @@
 compare_trees(tree1, tree2)
 }
 \arguments{
-\item{tree1}{A phylogenetic tree of class 'phylo'.}
+\item{tree1}{A phylogenetic tree of class 'phylo', representing the first tree to compare.}
 
-\item{tree2}{A phylogenetic tree of class 'phylo'.}
+\item{tree2}{A phylogenetic tree of class 'phylo', representing the second tree to compare.}
 }
 \value{
 A data frame containing the following similarity metrics:
 \describe{
-\item{RF_similarity}{Robinson-Foulds similarity, a measure of tree topology similarity (range: 0 to 1).}
-\item{edge_similarity}{Edge similarity, representing the proportion of common edges between the trees (range: 0 to 1).}
-\item{subtree_similarity}{Subtree similarity, based on the proportion of identical subtrees between the trees (range: 0 to 1).}
+\item{RF_similarity}{Robinson-Foulds similarity, a measure of tree topology similarity (range: 0 to 1). A higher value indicates greater similarity in tree topology.}
+\item{edge_similarity}{Edge similarity, representing the proportion of common edges between the two trees (range: 0 to 1). A value of 1 indicates identical edge structures.}
+\item{entanglement_value}{Entanglement value, a metric quantifying the structural similarity of the trees, with higher values indicating greater similarity.}
 }
 }
 \description{
-This function compares two phylogenetic trees by calculating their
-similarity based on three different metrics: Robinson-Foulds (RF) similarity,
-edge similarity, and subtree similarity. The comparisons are returned as a data frame.
+It compares two phylogenetic trees by calculating their
+similarity based on four different metrics: Robinson-Foulds (RF) similarity,
+edge similarity, and entanglement value. The comparisons
+are returned as a data frame containing the computed similarity values.
 }
 \details{
 \itemize{
-\item \strong{Robinson-Foulds Similarity} is calculated by measuring the RF distance and converting it into a similarity score. The RF distance compares the trees based on their edge partitioning.
-\item \strong{Edge Similarity} is determined by counting the common edges between the two trees and calculating the proportion of matching edges.
-\item \strong{Subtree Similarity} is determined by comparing the subtrees rooted at internal nodes, counting how many of them are identical between the two trees.
+\item \strong{Robinson-Foulds Similarity}: This metric is based on the Robinson-Foulds (RF) distance, which compares the trees by evaluating their edge partitions. The RF similarity score is computed by normalizing the RF distance with respect to the maximum possible RF distance between the two trees.
+\item \strong{Edge Similarity}: This metric measures the proportion of edges that are common between the two trees. It is calculated by comparing the edges of both trees and counting how many are identical.
+\item \strong{Entanglement Value}: This metric calculates the structural similarity of the trees based on their dendrogram representations. A higher entanglement value indicates a greater similarity in tree structure.
 }
 }
 \examples{
+\dontshow{if (requireNamespace("dendextend", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 # Compare two phylogenetic trees
-tree1 <- ape::rtree(100)
-tree2 <- phangorn::rSPR(tree1, 3)
-x <- compare_trees(tree1, tree2)
-
+DNA_seq <- system.file("extdata", "DNA_seq.fas", package = "phyloR")
+tree1 <- gene_tree(seq.file = DNA_seq,
+                   seq.type = "DNA",
+                   tree_method = "UPGMA")
+species = c("ath", "gmx", "zma", "osa",
+            "dme", "cel", "mmu", "rno",
+            "hsa", "mcc", "ssc", "bta",
+            "gga", "xla", "sce", "ece")
+tree2 <- species_tree(species = species, species.type = "abbspname")
+relation <- compare_trees(tree1, tree2)
+\dontshow{\}) # examplesIf}
 }

@@ -19,7 +19,7 @@
 #' @details It retrieves species classification data from a database (e.g., NCBI) based on the species names or IDs
 #' provided. It then constructs a phylogenetic tree using the taxonomy classification. The supported species input types
 #' are scientific names, taxonomic IDs, and abbreviated species names.
-#' @examples
+#' @examplesIf requireNamespace("taxize", quietly = TRUE)
 #' # Example 1:
 #' species1 <- c("Homo sapiens", "Pan troglodytes", "Mus musculus",
 #'               "Rattus norvegicus","Canis lupus familiaris", "Felis catus")
@@ -36,7 +36,6 @@
 #'              "gga", "xla", "sce", "ece")
 #' tree3 <- species_tree(species = species3, species.type = "abbspname")
 #'
-#' @importFrom taxize classification class2tree
 #'
 #' @export
 species_tree <- function(species,
@@ -44,12 +43,17 @@ species_tree <- function(species,
                          db = "ncbi",
                          show_tree = TRUE) {
 
+  if (!requireNamespace("taxize", quietly = TRUE)) {
+    stop("This feature needs the 'taxize' package. Please install it.",
+         call. = FALSE)
+  }
+
   # Process based on species type
   if(species.type == "scientificname") {
     find.id <- function(a) {which(species_tbl[, 4] == a)}
     ids <- NULL
     for(i in 1:length(species)){
-      position <- as.vector(sapply(species[i], find.id))
+      position <- unlist(sapply(species[i], find.id))
       if(length(position) == 0){
         warning(paste(species[i], "No valid species found.", sep = ":"))
         position <- position
@@ -65,7 +69,21 @@ species_tree <- function(species,
   }
 
   if(species.type == "taxonomic_id") {
-    classification <- taxize::classification(species, db = db)
+    find.id <- function(a) {which(species_tbl[, 2] == a)}
+    ids <- NULL
+    for(i in 1:length(species)){
+      position <- unlist(sapply(species[i], find.id))
+      if(length(position) == 0){
+        warning(paste(species[i], "No valid species found.", sep = ":"))
+        position <- position
+      }
+      if(length(position) >= 1){
+        position <- position[1]
+      }
+      id <- species_tbl[position, 2]
+      ids <- c(ids, id)
+    }
+    classification <- taxize::classification(ids, db = db)
     tr <- taxize::class2tree(classification)
   }
 
@@ -73,7 +91,7 @@ species_tree <- function(species,
   find.id <- function(a) {which(species_tbl[, 3] == a)}
   ids <- NULL
   for(i in 1:length(species)){
-    position <- as.vector(sapply(species[i], find.id))
+    position <- unlist(sapply(species[i], find.id))
     if(length(position) == 0){
       warning(paste(species[i], "No valid species found.", sep = ":"))
       position <- position

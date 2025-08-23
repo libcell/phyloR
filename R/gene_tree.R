@@ -22,9 +22,9 @@
 #'   - **Unweighted Pair Group Method with Arithmetic Mean (UPGMA)**: Generates a UPGMA tree based on pairwise distances.
 #'   - **Bayesian-Inference (BI)**: Constructs a Bayesian phylogenetic tree using BEAST2 and supports posterior probabilities.
 #'
-#' @importFrom ape dist.dna njs boot.phylo nj dist.aa drawSupportOnEdges di2multi prop.clades
+#' @importFrom ape dist.dna njs dist.aa di2multi prop.clades root
 #' @importFrom adegenet fasta2DNAbin
-#' @importFrom phangorn as.phyDat pratchet acctran plotBS modelTest pml_bb bootstrap.pml upgma
+#' @importFrom phangorn as.phyDat pratchet acctran modelTest pml_bb upgma midpoint
 #' @importFrom babette bbt_run_from_model
 #' @importFrom beastierinstall install_beast2
 #' @importFrom remotes install_github
@@ -56,39 +56,83 @@ gene_tree <- function(seq.file,
     stop("File not found: ", seq.file)
   }
 
+  # Process input type
+  seq.type <- toupper(seq.type)
+
   # Read the sequence data based the sequence type
-  if (!seq.type %in% c("DNA", "protein", "dna", "Protein")) {
+  if (!seq.type %in% c("DNA", "PROTEIN")) {
     stop("Invalid sequence type. Choose either 'DNA' or 'protein'.")
   }
-  if(toupper(seq.type) == "DNA"){
+  if(seq.type == "DNA"){
     seq <- adegenet::fasta2DNAbin(seq.file)
   }
-  if(tolower(seq.type) == "protein"){
+  if(seq.type == "PROTEIN"){
     seq <- adegenet::fasta2DNAbin(seq.file)
   }
 
   # --- Neighbor-Joining (NJ) method ---
   if(toupper(tree_method) == "NJ"){
-    if(toupper(seq.type) == "DNA"){
+    if(seq.type == "DNA"){
       dist <- ape::dist.dna(seq)
       treenj <- ape::njs(dist)
-      bstrees <- ape::boot.phylo(treenj, seq,
-                                 FUN = function(x) ape::nj(ape::dist.dna(x)),
-                                 trees = FALSE)
+      auto_select_outgroup <- function(tree, alignment) {
+        dist_mat <- as.matrix(ape::dist.dna(alignment))
+        avg_dist <- apply(dist_mat, 1, mean)
+        outgroup_candidate <- names(which.max(avg_dist))
+        ingroup_distances <- dist_mat[rownames(dist_mat) != outgroup_candidate, outgroup_candidate]
+        avg_ingroup_dist <- mean(ingroup_distances)
+        ingroup_only <- dist_mat[rownames(dist_mat) != outgroup_candidate,
+                                 colnames(dist_mat) != outgroup_candidate]
+        avg_ingroup_internal <- mean(ingroup_only)
+
+        if (avg_ingroup_dist > avg_ingroup_internal * 1.5) {
+          return(outgroup_candidate)
+        } else {
+          midpoint_rooted_tree <- phangorn::midpoint(treenj)
+          return(midpoint_rooted_tree)
+        }
+      }
+
+      outgroup <- auto_select_outgroup(treenj, seq)
+      if (outgroup %in% treenj$tip.label) {
+        rooted_tree <- ape::root(treenj, outgroup = outgroup, resolve.root = TRUE)
+      } else {
+        rooted_tree <- midpoint(treenj)
+      }
     }
-    if(tolower(seq.type) == "protein"){
+    if(seq.type == "PROTEIN"){
       dist <- ape::dist.aa(seq)
       treenj <- ape::njs(dist)
-      bstrees <- ape::boot.phylo(treenj, seq,
-                                 FUN = function(x) ape::nj(ape::dist.aa(x)),
-                                 trees = FALSE)
+      auto_select_outgroup <- function(tree, alignment) {
+        dist_mat <- as.matrix(ape::dist.aa(alignment))
+        avg_dist <- apply(dist_mat, 1, mean)
+        outgroup_candidate <- names(which.max(avg_dist))
+        ingroup_distances <- dist_mat[rownames(dist_mat) != outgroup_candidate, outgroup_candidate]
+        avg_ingroup_dist <- mean(ingroup_distances)
+        ingroup_only <- dist_mat[rownames(dist_mat) != outgroup_candidate,
+                                 colnames(dist_mat) != outgroup_candidate]
+        avg_ingroup_internal <- mean(ingroup_only)
+
+        if (avg_ingroup_dist > avg_ingroup_internal * 1.5) {
+          return(outgroup_candidate)
+        } else {
+          midpoint_rooted_tree <- midpoint(treenj)
+          return(midpoint_rooted_tree)
+        }
+      }
+
+      outgroup <- auto_select_outgroup(treenj, seq)
+      if (outgroup %in% treenj$tip.label) {
+        rooted_tree <- ape::root(treenj, outgroup = outgroup, resolve.root = TRUE)
+      } else {
+        rooted_tree <- phangorn::midpoint(treenj)
+      }
     }
 
     if(show_tree == TRUE){
-      plot(treenj)
-      ape::drawSupportOnEdges(bstrees)
+      plot(rooted_tree)
     }
-    return(treenj)
+    return(rooted_tree)
   }
 
   # --- Maximum-Parsimony (MP) method ---
@@ -100,7 +144,7 @@ gene_tree <- function(seq.file,
     if(inherits(treeRatchet, "multiPhylo")){
       treeRatchet <- unique(treeRatchet)}
     if(show_tree == TRUE) {
-      phangorn::plotBS(treeRatchet)
+      plot(treeRatchet)
     }
     return(treeRatchet)
   }
@@ -108,41 +152,31 @@ gene_tree <- function(seq.file,
   # --- Maximum-Likelihood (ML) method ---
   if(toupper(tree_method) == "ML") {
     phydata <- phangorn::as.phyDat(seq)
-    if(toupper(seq.type) == "DNA"){
+    if(seq.type == "DNA"){
       modeltest <- phangorn::modelTest(phydata)
     }
-    if(tolower(seq.type) == "protein"){
+    if(seq.type == "PROTEIN"){
       modeltest <- phangorn::modelTest(phydata, model = "WAG")
     }
     pml <- phangorn::pml_bb(modeltest)
-    bstrees <- phangorn::bootstrap.pml(pml)
     if(show_tree == TRUE) {
-      phangorn::plotBS(pml$tree, bstrees)
+      plot(pml$tree)
     }
     return(pml$tree)
   }
 
   # --- Unweighted Pair Group Method with Arithmetic Mean (UPGMA) ---
   if(toupper(tree_method) == "UPGMA"){
-    if(toupper(seq.type) == "DNA"){
+    if(seq.type == "DNA"){
       dist_matrix <- ape::dist.dna(seq, model = "JC69")
       upgma_tree <- phangorn::upgma(dist_matrix)
-      bootstrap <- ape::boot.phylo(upgma_tree,
-                                   seq,
-                                   FUN = function(x) phangorn::upgma(ape::dist.dna(x)),
-                                   trees = FALSE)
     }
-    if(tolower(seq.type) == "protein"){
+    if(seq.type == "protein"){
       dist_matrix <- ape::dist.aa(seq)
       upgma_tree <- phangorn::upgma(dist_matrix)
-      bootstrap <- ape::boot.phylo(upgma_tree,
-                                   seq,
-                                   FUN = function(x) phangorn::upgma(ape::dist.aa(x)),
-                                   trees = FALSE)
     }
     if(show_tree == TRUE){
       plot(upgma_tree)
-      ape::drawSupportOnEdges(bootstrap)
     }
     return(upgma_tree)
   }
@@ -162,7 +196,7 @@ gene_tree <- function(seq.file,
           beastierinstall::install_beast2()
           message("BEAST2 installation was successful!")
         }, error = function(e) {
-          message("Installation failed: ", e$message)
+          message("No installation required: ", e$message)
         })
       }
     }
@@ -173,17 +207,11 @@ gene_tree <- function(seq.file,
                                            beast2_options = beastier::create_beast2_options())
 
     # Check the file format
-    valid_extensions <- c("fas", "fasta")
     file_extension <- tools::file_ext(seq.file)
-    if (!(file_extension %in% valid_extensions)) {
-      stop(paste("Invalid file extension for", seq.file, " Only 'fas' and 'fasta' files are allowed."))
+    if (!(file_extension %in% c("fas", "fasta"))) {
+      stop("Invalid file extension.")
     }
-    if(file_extension == "fas"){
-      file_name <- sub("\\.fas$", "", basename(seq.file))
-    }
-    if(file_extension == "fasta"){
-      file_name <- sub("\\.fasta$", "", basename(seq.file))
-    }
+    file_name <- sub("\\.(fas|fasta)$", "", basename(seq.file))
     tmp <- paste(file_name, "trees", sep = "_")
 
     treeBI <- outputs[[tmp]][[which.max(outputs$estimates$posterior)]]
@@ -191,8 +219,14 @@ gene_tree <- function(seq.file,
     posterior <- round(ape::prop.clades(treeBI, con.trees)/9999*100)
     if(show_tree == TRUE) {
       plot(treeBI)
-      ape::drawSupportOnEdges(posterior)
     }
     return(treeBI)
+
+    # Delete all .log and .trees files
+    unlink(list.files(pattern = "\\.(log|trees)$"), recursive = TRUE)
+
+  }
+  else {
+    stop("Unknown tree method. Please choose 'ML', 'NJ', 'UPGMA', 'MP', or 'BI'.")
   }
 }

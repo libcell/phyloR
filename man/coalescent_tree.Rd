@@ -57,7 +57,7 @@ dna <- c("K01939", "K03644", "K00797", "K00927", "K00088", "K02257", "K00164",
          "K00820", "K06158", "K00008")
 data_dir <- system.file("extdata", "sequences", package = "phyloR")
 tree1 <- coalescent_tree(seq.file = dna,
-                         seq.type = "protein",
+                         seq.type = "DNA",
                          data_dir = data_dir,
                          tree_method = "NJ",
                          show_tree = TRUE)

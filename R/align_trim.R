@@ -34,12 +34,27 @@ align_trim <- function(seq.file,
                        method = "ClustalW",
                        output_file = NULL){
 
-
-  # Read the sequence file based the sequence type
-  if(toupper(seq.type) == "DNA"){
-    mySeqs <- Biostrings::readDNAStringSet(seq.file)
+  # Check if the sequence file exists
+  if (!file.exists(seq.file)) {
+    stop("File not found: ", seq.file)
   }
-  if(tolower(seq.type) == "protein"){
+
+  # Additional check for file format (FASTA)
+  file_ext <- tools::file_ext(seq.file)
+  if (!(file_ext %in% c("fas", "fasta", "fa"))) {
+    stop("The file must be in FASTA format. Invalid file extension: ", file_ext)
+  }
+
+  # Check if the sequence type is valid
+  seq.type <- toupper(seq.type)
+  if (!seq.type %in% c("DNA", "PROTEIN")) {
+    stop("Invalid sequence type. Please choose 'DNA' or 'protein'.")
+  }
+
+  # Read the sequence file based on the sequence type
+  if(seq.type == "DNA"){
+    mySeqs <- Biostrings::readDNAStringSet(seq.file)
+  } else if(seq.type == "PROTEIN"){
     mySeqs <- Biostrings::readAAStringSet(seq.file)
   }
 
@@ -47,25 +62,42 @@ align_trim <- function(seq.file,
   alignment <- msa::msa(mySeqs, method = method)
 
   # Convert alignment to bios2mds format and export it to a temporary FASTA file
-  alignment_set <- msa::msaConvert(alignment, type = "bios2mds::align")
-  bios2mds::export.fasta(alignment_set,
-                         outfile = "alignment.fas",
-                         ncol = 60,
-                         open = "w")
+  tryCatch({
+    alignment_set <- msa::msaConvert(alignment, type = "bios2mds::align")
+    bios2mds::export.fasta(alignment_set,
+                           outfile = "alignment.fas",
+                           ncol = 60,
+                           open = "w")
+  }, error = function(e) {
+    stop("Failed to convert the alignment to bios2mds format. Please check the alignment method.")
+  })
 
   # Read the temporary file and trim the alignment
   aligned <- microseq::readFasta("alignment.fas")
   aln_trimmed <- microseq::msaTrim(aligned)
 
   # Remove the temporary FASTA file
-  file.remove("alignment.fas")
+  tryCatch({
+    file.remove("alignment.fas")
+  }, error = function(e) {
+    warning("Failed to remove temporary file: alignment.fas. Please delete it manually.")
+  })
 
   # Return processed sequences or save it to a file
   if(is.null(output_file)){
     return(aln_trimmed)
   }
+
   if(!is.null(output_file)){
+    # Check if file exists and prompt for overwrite
+    if (file.exists(output_file)) {
+      overwrite <- readline(prompt = paste("File", output_file, "already exists. Do you want to overwrite? (y/n): "))
+      if (tolower(overwrite) != "y") {
+        stop("Operation cancelled. File not overwritten.")
+      }
+    }
     microseq::writeFasta(aln_trimmed, out.file = output_file)
   }
 }
+
 

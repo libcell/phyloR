@@ -16,12 +16,12 @@ get_kegg_sequences(
 \item{gene_ids}{A character vector of gene identifiers (e.g., KO IDs, NCBI gene IDs, or KEGG gene IDs).}
 
 \item{id.type}{A character string indicating the type of the provided gene IDs.
-Options are "KO_id", "ncbi_id", or "kegg_id" (default is "KO_id").}
+Options are "ko_id", "ncbi_id", or "kegg_id" (default is "ko_id").}
 
 \item{seq.type}{A character string specifying the type of sequence to retrieve.
 Options are "DNA" or "protein" (default is "protein").}
 
-\item{species.list}{A character vector of species names to filter results by species.Normally not NULL only if gene_ids is "KO_id".
+\item{species.list}{A character vector of species names to filter results by species.Normally not NULL only if gene_ids is "ko_id".
 If NULL, no filtering is applied (default is NULL).}
 
 \item{species.type}{A character string specifying the type of species identifier.
@@ -39,7 +39,7 @@ It can handle different types of gene identifiers and allows filtering by specie
 \examples{
 # Example 1: Retrieve protein sequences for a list of KO IDs
 seq_set1 <- get_kegg_sequences(gene_ids = "K00161",
-                               id.type = "KO_id",
+                               id.type = "ko_id",
                                seq.type = "DNA",
                                species.list = c("hsa", "ptr"),
                                species.type = "abbspname")

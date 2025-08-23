@@ -6,7 +6,7 @@
 \usage{
 concat_tree_fetch(
   gene_ids,
-  id.type = "KO_id",
+  id.type = "ko_id",
   species.list = NULL,
   species.type = "scientificname",
   seq.type = "DNA",
@@ -18,7 +18,7 @@ concat_tree_fetch(
 \arguments{
 \item{gene_ids}{A character vector of gene IDs to be used for building the concatenate tree.}
 
-\item{id.type}{The type of gene ID used(e.g., KO_id, ncbi_id, or kegg_id), default is "KO_id" (KEGG Orthology ID).}
+\item{id.type}{The type of gene ID used(e.g., ko_id, ncbi_id, or kegg_id), default is "ko_id" (KEGG Orthology ID).}
 
 \item{species.list}{A character vector specifying the species to be included in the analysis.
 If NULL, all species available for each gene ID will be used.}
@@ -63,7 +63,7 @@ tree <- concat_tree_fetch(gene_ids = c("K00820", "K00088", "K00927",
                                        "K06158", "K00008","K00164",
                                        "K00797", "K01939", "K02257",
                                        "K03644"),
-                          id.type = "KO_id",
+                          id.type = "ko_id",
                           species.list = c("ath", "gmx", "zma", "osa",
                                            "dme", "cel", "mmu", "rno",
                                            "hsa", "mcc", "ssc", "bta",

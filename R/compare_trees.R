@@ -1,116 +1,129 @@
 #' Compare Two Phylogenetic Trees
 #'
-#' This function compares two phylogenetic trees by calculating their
-#' similarity based on three different metrics: Robinson-Foulds (RF) similarity,
-#' edge similarity, and subtree similarity. The comparisons are returned as a data frame.
+#' It compares two phylogenetic trees by calculating their
+#' similarity based on four different metrics: Robinson-Foulds (RF) similarity,
+#' edge similarity, and entanglement value. The comparisons
+#' are returned as a data frame containing the computed similarity values.
 #'
-#' @param tree1 A phylogenetic tree of class 'phylo'.
-#' @param tree2 A phylogenetic tree of class 'phylo'.
+#' @param tree1 A phylogenetic tree of class 'phylo', representing the first tree to compare.
+#' @param tree2 A phylogenetic tree of class 'phylo', representing the second tree to compare.
 #'
 #' @return A data frame containing the following similarity metrics:
 #' \describe{
-#'   \item{RF_similarity}{Robinson-Foulds similarity, a measure of tree topology similarity (range: 0 to 1).}
-#'   \item{edge_similarity}{Edge similarity, representing the proportion of common edges between the trees (range: 0 to 1).}
-#'   \item{subtree_similarity}{Subtree similarity, based on the proportion of identical subtrees between the trees (range: 0 to 1).}
+#'   \item{RF_similarity}{Robinson-Foulds similarity, a measure of tree topology similarity (range: 0 to 1). A higher value indicates greater similarity in tree topology.}
+#'   \item{edge_similarity}{Edge similarity, representing the proportion of common edges between the two trees (range: 0 to 1). A value of 1 indicates identical edge structures.}
+#'   \item{entanglement_value}{Entanglement value, a metric quantifying the structural similarity of the trees, with higher values indicating greater similarity.}
 #' }
 #'
 #' @details
-#' - **Robinson-Foulds Similarity** is calculated by measuring the RF distance and converting it into a similarity score. The RF distance compares the trees based on their edge partitioning.
-#' - **Edge Similarity** is determined by counting the common edges between the two trees and calculating the proportion of matching edges.
-#' - **Subtree Similarity** is determined by comparing the subtrees rooted at internal nodes, counting how many of them are identical between the two trees.
+#' - **Robinson-Foulds Similarity**: This metric is based on the Robinson-Foulds (RF) distance, which compares the trees by evaluating their edge partitions. The RF similarity score is computed by normalizing the RF distance with respect to the maximum possible RF distance between the two trees.
+#' - **Edge Similarity**: This metric measures the proportion of edges that are common between the two trees. It is calculated by comparing the edges of both trees and counting how many are identical.
+#' - **Entanglement Value**: This metric calculates the structural similarity of the trees based on their dendrogram representations. A higher entanglement value indicates a greater similarity in tree structure.
 #'
-#'
-#' @examples
+#' @examplesIf requireNamespace("dendextend", quietly = TRUE)
 #' # Compare two phylogenetic trees
-#' tree1 <- ape::rtree(100)
-#' tree2 <- phangorn::rSPR(tree1, 3)
-#' x <- compare_trees(tree1, tree2)
+#' DNA_seq <- system.file("extdata", "DNA_seq.fas", package = "phyloR")
+#' tree1 <- gene_tree(seq.file = DNA_seq,
+#'                    seq.type = "DNA",
+#'                    tree_method = "UPGMA")
+#' species = c("ath", "gmx", "zma", "osa",
+#'             "dme", "cel", "mmu", "rno",
+#'             "hsa", "mcc", "ssc", "bta",
+#'             "gga", "xla", "sce", "ece")
+#' tree2 <- species_tree(species = species, species.type = "abbspname")
+#' relation <- compare_trees(tree1, tree2)
 #'
-#' @importFrom phangorn RF.dist rSPR
-#' @importFrom ape Ntip Nnode extract.clade rtree
+#' @importFrom phangorn RF.dist
+#' @importFrom ape Ntip Nnode extract.clade node.depth.edgelength is.ultrametric
+#' @importFrom stats as.dendrogram
 #'
 #' @export
 compare_trees <- function(tree1, tree2) {
+
+  if (!requireNamespace("dendextend", quietly = TRUE)) {
+    stop("This feature needs the 'taxize' package. Please install it.",
+         call. = FALSE)
+  }
+
+  .silently_require("dendextend")
+
   # Ensure both trees are of class 'phylo'
   if (!inherits(tree1, "phylo") || !inherits(tree2, "phylo")) {
     stop("Both input trees must be of class 'phylo'.")
   }
 
-  # Initialize a data frame to store comparison results
+  # Initialize result dataframe
   relation <- data.frame(RF_similarity = NA,
                          edge_similarity = NA,
-                         subtree_similarity = NA,
+                         entanglement_value = NA,
                          stringsAsFactors = FALSE)
 
   # Calculate Robinson-Foulds similarity
-  # Robinson-Foulds distance using phangorn package, then convert to similarity (range 0, 1]
-  max_RF <- max(length(tree1$edge), length(tree2$edge)) - 1  # Max possible RF distance
+  max_RF <- max(length(tree1$edge), length(tree2$edge)) - 1
   RF_distance <- phangorn::RF.dist(tree1, tree2)
-  relation$RF_similarity <- max(0, 1 - RF_distance / max_RF)  # Convert RF to similarity range [0, 1]
+  relation$RF_similarity <- round(max(0, 1 - RF_distance / max_RF), 4)
 
-  # Function to calculate edge similarity based on common edges
+  # Function to calculate edge similarity
   calculate_edge_similarity <- function(tree1, tree2) {
-    # Convert edges to a unique identifier (string)
+    # Convert edges to unique strings
     tree1_edges <- apply(tree1$edge, 1, function(x) paste(x, collapse = "-"))
     tree2_edges <- apply(tree2$edge, 1, function(x) paste(x, collapse = "-"))
 
-    # Find common edges between the two trees
+    # Find common edges
     common_edges <- length(intersect(tree1_edges, tree2_edges))
 
-    # The edge similarity is the proportion of common edges, mapped to range (0, 1]
+    # Edge similarity as the proportion of common edges
     edge_similarity <- common_edges / max(length(tree1_edges), length(tree2_edges))
-    return(max(0, edge_similarity))  # Map to [0, 1]
+    return(max(0, edge_similarity))
   }
 
   # Calculate edge similarity
-  relation$edge_similarity <- calculate_edge_similarity(tree1, tree2)
+  relation$edge_similarity <- round(calculate_edge_similarity(tree1, tree2), 4)
 
-  # Function to calculate subtree similarity based on identical subtrees
-  calculate_subtree_similarity <- function(tree1, tree2) {
-    subtree_common_count <- 0
-    num_tips <- ape::Ntip(tree1)  # Number of tips in the tree
-    num_nodes <- ape::Nnode(tree1)  # Number of internal nodes in the tree
-
-    # Loop over the internal nodes and extract subtrees to compare
-    for (i in (num_tips + 1):(num_tips + num_nodes)) {
-      # Ensure the node is valid before extracting the subtree
-      if (i <= length(tree1$edge)) {
-        subtree1 <- ape::extract.clade(tree1, i)
-        subtree2 <- ape::extract.clade(tree2, i)
-
-        # Compare the subtrees
-        if (identical(subtree1, subtree2)) {
-          subtree_common_count <- subtree_common_count + 1
-        }
+  # Align tip nodes if trees are not ultrametric (equal tip depths)
+  if(!ape::is.ultrametric(tree1)){
+    align_tip_nodes <- function(phy) {
+      aligned_tree <- phy
+      node_depths <- ape::node.depth.edgelength(phy)
+      tip_depths <- node_depths[1:length(phy$tip.label)]
+      max_depth <- max(tip_depths)
+      shortage <- max_depth - tip_depths
+      for (i in 1:length(phy$tip.label)) {
+        edge_index <- which(phy$edge[, 2] == i)
+        aligned_tree$edge.length[edge_index] <- phy$edge.length[edge_index] + shortage[i]
       }
+      return(aligned_tree)
     }
-
-    # Calculate subtree similarity as the proportion of common subtrees, mapped to range (0, 1]
-    total_subtrees <- num_nodes  # Total internal nodes/subtrees to compare
-    subtree_similarity <- subtree_common_count / total_subtrees
-    return(max(0, subtree_similarity))  # Map to [0, 1]
+    tree1 <- align_tip_nodes(tree1)
+  }
+  if(!ape::is.ultrametric(tree2)){
+    align_tip_nodes <- function(phy) {
+      aligned_tree <- phy
+      node_depths <- ape::node.depth.edgelength(phy)
+      tip_depths <- node_depths[1:length(phy$tip.label)]
+      max_depth <- max(tip_depths)
+      shortage <- max_depth - tip_depths
+      for (i in 1:length(phy$tip.label)) {
+        edge_index <- which(phy$edge[, 2] == i)
+        aligned_tree$edge.length[edge_index] <- phy$edge.length[edge_index] + shortage[i]
+      }
+      return(aligned_tree)
+    }
+    tree2 <- align_tip_nodes(tree2)
   }
 
-  # Calculate subtree similarity
-  relation$subtree_similarity <- calculate_subtree_similarity(tree1, tree2)
+  # Convert trees to dendrogram objects
+  dend1 <- stats::as.dendrogram(tree1)
+  dend2 <- stats::as.dendrogram(tree2)
 
-  # Return the results as a data frame
+  # Create dendlist and calculate entanglement value
+  dend_list <- dendextend::dendlist(dend1, dend2)
+  entanglement_value <- dendextend::entanglement(dend_list)
+
+  # Store entanglement value in the result data frame
+  relation$entanglement_value <- round(entanglement_value, 4)
+
+  # Return the comparison results
   return(relation)
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

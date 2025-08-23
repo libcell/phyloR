@@ -15,7 +15,6 @@ Imports: KEGGREST,
          adegenet, 
          phangorn, 
          rentrez, 
-         taxize, 
          babette, 
          microseq, 
          msa, 
@@ -28,11 +27,14 @@ Imports: KEGGREST,
          apex,
          methods,
          beautier,
-         beastier
+         beastier,
+         utils,
+         crayon,
+         stats
 License: GPL-3
 Encoding: UTF-8
 LazyData: TRUE
-Suggests: rmarkdown, testthat, knitr, crayon
+Suggests: rmarkdown, testthat, knitr, taxize, dendextend
 Remotes: richelbilderbeek/beastierinstall
 URL: http://github.com/Lifei-9/phyloR
 BugReports: http://github.com/Lifei-9/phyloR/issues

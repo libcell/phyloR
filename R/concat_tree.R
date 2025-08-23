@@ -28,8 +28,8 @@
 #'   5. Returns the phylogenetic tree object.
 #'
 #' @importFrom adegenet fasta2DNAbin
-#' @importFrom ape dist.dna dist.aa nj di2multi prop.clades as.DNAbin as.AAbin
-#' @importFrom phangorn as.phyDat modelTest pml_bb upgma pratchet acctran
+#' @importFrom ape dist.dna dist.aa nj di2multi prop.clades as.DNAbin as.AAbin root
+#' @importFrom phangorn as.phyDat modelTest pml_bb upgma pratchet acctran midpoint
 #' @importFrom methods new
 #' @importFrom apex concatenate
 #' @importFrom babette bbt_run_from_model
@@ -56,6 +56,8 @@ concat_tree <- function(seq.files,
                         seq.type = "DNA",
                         tree_method = "ML",
                         show_tree = TRUE) {
+  # Process input type
+  seq.type <- toupper(seq.type)
 
   # Check if the data directory is provided
   if(is.null(data_dir)){
@@ -63,12 +65,18 @@ concat_tree <- function(seq.files,
   }
 
   # Handle DNA sequences case
-  if (toupper(seq.type) == "DNA") {
+  if (seq.type == "DNA") {
     DNAbin_list <- list()
 
     # Loop through each sequences file and convert it to DNAbin format
     for (i in seq_along(seq.files)) {
       seq.file <- paste0(data_dir, "/", seq.files[i], ".fas")
+
+      # Check if the sequence file exists
+      if (!file.exists(seq.file)) {
+        warning("File not found: ", seq.files[i])
+      }
+
       dna_data <- adegenet::fasta2DNAbin(seq.file)
       DNAbin_list[[i]] <- dna_data
     }
@@ -80,10 +88,34 @@ concat_tree <- function(seq.files,
     # Tree construction based on the selected method for DNA sequences
     if (toupper(tree_method) == "ML") {
       modeltest <- phangorn::modelTest(phydata)
-      pml <- phangorn::pml_bb(modeltest)
+      treenj <- phangorn::pml_bb(modeltest)
     } else if (toupper(tree_method) == "NJ") {
       dist_matrix <- ape::dist.dna(ape::as.DNAbin(phydata))
-      pml <- ape::nj(dist_matrix)
+      treenj <- ape::nj(dist_matrix)
+      auto_select_outgroup <- function(tree, alignment) {
+        dist_mat <- as.matrix(ape::dist.dna(alignment))
+        avg_dist <- apply(dist_mat, 1, mean)
+        outgroup_candidate <- names(which.max(avg_dist))
+        ingroup_distances <- dist_mat[rownames(dist_mat) != outgroup_candidate, outgroup_candidate]
+        avg_ingroup_dist <- mean(ingroup_distances)
+        ingroup_only <- dist_mat[rownames(dist_mat) != outgroup_candidate,
+                                 colnames(dist_mat) != outgroup_candidate]
+        avg_ingroup_internal <- mean(ingroup_only)
+
+        if (avg_ingroup_dist > avg_ingroup_internal * 1.5) {
+          return(outgroup_candidate)
+        } else {
+          midpoint_rooted_tree <- phangorn::midpoint(treenj)
+          return(midpoint_rooted_tree)
+        }
+      }
+
+      outgroup <- auto_select_outgroup(treenj, dna_data)
+      if (outgroup %in% treenj$tip.label) {
+        pml <- ape::root(treenj, outgroup = outgroup, resolve.root = TRUE)
+      } else {
+        pml <- phangorn::midpoint(treenj)
+      }
     } else if (toupper(tree_method) == "UPGMA") {
       dist_matrix <- ape::dist.dna(ape::as.DNAbin(phydata))
       pml <- phangorn::upgma(dist_matrix)
@@ -111,7 +143,7 @@ concat_tree <- function(seq.files,
             beastierinstall::install_beast2()
             message("BEAST2 installation was successful!")
           }, error = function(e) {
-            message("Installation failed: ", e$message)
+            message("No installation required: ", e$message)
           })
         }
       }
@@ -122,22 +154,21 @@ concat_tree <- function(seq.files,
       outputs <- babette::bbt_run_from_model(seq.file,
                                              inference_model = beautier::create_inference_model(),
                                              beast2_options = beastier::create_beast2_options())
-      valid_extensions <- c("fas", "fasta")
       file_extension <- tools::file_ext(seq.file)
-      if (!(file_extension %in% valid_extensions)) {
-        stop(paste("Invalid file extension for", seq.file, ". Only 'fas' and 'fasta' files are allowed."))
+      if (!(file_extension %in% c("fas", "fasta"))) {
+        stop("Invalid file extension.")
       }
-      if(file_extension == "fas"){
-        file_name <- sub("\\.fas$", "", basename(seq.file))
-      }
-      if(file_extension == "fasta"){
-        file_name <- sub("\\.fasta$", "", basename(seq.file))
-      }
+      file_name <- sub("\\.(fas|fasta)$", "", basename(seq.file))
+
       tmp <- paste(file_name, "trees", sep = "_")
       treeBI <- outputs[[tmp]][[which.max(outputs$estimates$posterior)]]
       con.trees <- outputs[[tmp]][3:length(outputs[[tmp]])]
       posterior <- round(ape::prop.clades(treeBI, con.trees)/9999*100)
       pml <- treeBI
+
+      # Delete all .log and .trees files
+      unlink(list.files(pattern = "\\.(log|trees)$"), recursive = TRUE)
+
     } else {
       stop("Unknown tree method. Please choose 'ML', 'NJ', 'UPGMA', 'MP', or 'BI'.")
     }
@@ -150,12 +181,18 @@ concat_tree <- function(seq.files,
 
     return(pml)
 
-  } else if (tolower(seq.type) == "protein") {
+  } else if (seq.type == "PROTEIN") {
     AAbin_list <- list()
 
     # Loop through each sequences file and convert it to AAbin format
     for (i in seq_along(seq.files)) {
       seq.file <- paste0(data_dir, "/", seq.files[i], ".fas")
+
+      # Check if the sequence file exists
+      if (!file.exists(seq.file)) {
+        warning("File not found: ", seq.files[i])
+      }
+
       aa_data <- adegenet::fasta2DNAbin(seq.file)
       AAbin_list[[i]] <- aa_data
     }
@@ -170,7 +207,31 @@ concat_tree <- function(seq.files,
       pml <- phangorn::pml_bb(modeltest)
     } else if (toupper(tree_method) == "NJ") {
       dist_matrix <- ape::dist.aa(ape::as.AAbin(phydata))
-      pml <- ape::nj(dist_matrix)
+      treenj <- ape::nj(dist_matrix)
+      auto_select_outgroup <- function(tree, alignment) {
+        dist_mat <- as.matrix(ape::dist.aa(alignment))
+        avg_dist <- apply(dist_mat, 1, mean)
+        outgroup_candidate <- names(which.max(avg_dist))
+        ingroup_distances <- dist_mat[rownames(dist_mat) != outgroup_candidate, outgroup_candidate]
+        avg_ingroup_dist <- mean(ingroup_distances)
+        ingroup_only <- dist_mat[rownames(dist_mat) != outgroup_candidate,
+                                 colnames(dist_mat) != outgroup_candidate]
+        avg_ingroup_internal <- mean(ingroup_only)
+
+        if (avg_ingroup_dist > avg_ingroup_internal * 1.5) {
+          return(outgroup_candidate)
+        } else {
+          midpoint_rooted_tree <- midpoint(treenj)
+          return(midpoint_rooted_tree)
+        }
+      }
+
+      outgroup <- auto_select_outgroup(treenj, aa_data)
+      if (outgroup %in% treenj$tip.label) {
+        pml <- ape::root(treenj, outgroup = outgroup, resolve.root = TRUE)
+      } else {
+        pml <- phangorn::midpoint(treenj)
+      }
     } else if (toupper(tree_method) == "UPGMA") {
       dist_matrix <- ape::dist.aa(ape::as.AAbin(phydata))
       pml <- phangorn::upgma(dist_matrix)
@@ -198,7 +259,7 @@ concat_tree <- function(seq.files,
             beastierinstall::install_beast2()
             message("BEAST2 installation was successful!")
           }, error = function(e) {
-            message("Installation failed: ", e$message)
+            message("No installation required: ", e$message)
           })
         }
       }
@@ -209,23 +270,20 @@ concat_tree <- function(seq.files,
       outputs <- babette::bbt_run_from_model(seq.file,
                                              inference_model = beautier::create_inference_model(),
                                              beast2_options = beastier::create_beast2_options())
-
-      valid_extensions <- c("fas", "fasta")
       file_extension <- tools::file_ext(seq.file)
-      if (!(file_extension %in% valid_extensions)) {
-        stop(paste("Invalid file extension for", seq.file, ". Only 'fas' and 'fasta' files are allowed."))
+      if (!(file_extension %in% c("fas", "fasta"))) {
+        stop("Invalid file extension.")
       }
-      if(file_extension == "fas"){
-        file_name <- sub("\\.fas$", "", basename(seq.file))
-      }
-      if(file_extension == "fasta"){
-        file_name <- sub("\\.fasta$", "", basename(seq.file))
-      }
+      file_name <- sub("\\.(fas|fasta)$", "", basename(seq.file))
       tmp <- paste(file_name, "trees", sep = "_")
       treeBI <- outputs[[tmp]][[which.max(outputs$estimates$posterior)]]
       con.trees <- outputs[[tmp]][3:length(outputs[[tmp]])]
       posterior <- round(ape::prop.clades(treeBI, con.trees)/9999*100)
       pml <- treeBI
+
+      # Delete all .log and .trees files
+      unlink(list.files(pattern = "\\.(log|trees)$"), recursive = TRUE)
+
     } else {
       stop("Unknown tree method. Please choose 'ML', 'NJ', 'UPGMA', 'MP', or 'BI'.")
     }

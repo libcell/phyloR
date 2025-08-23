@@ -1,4 +1,16 @@
-# zzz.R
+#' .onAttach function for the 'phyloR' package
+#'
+#' It is executed when the 'phyloR' package is loaded. It checks if the 'crayon' package
+#' is available to display a colorful welcome message. If 'crayon' is not found, a simpler message
+#' is shown.
+#'
+#' @param libname Character string; the library name.
+#' @param pkgname Character string; the package name.
+#'
+#' @importFrom crayon green blue magenta bold
+#' @importFrom utils packageVersion
+#'
+#' @export
 .onAttach <- function(libname, pkgname) {
   if (requireNamespace("crayon", quietly = TRUE)) {
     green <- crayon::green
@@ -8,12 +20,12 @@
 
     packageStartupMessage(
       "\n", bold(green("==========================================\n")),
-      bold(blue("       🌿 Welcome to phyloR 🌿\n")),
+      bold(blue("       \U1F33F Welcome to phyloR \U1F33F\n")),
       bold(magenta("  Phylogenetic Analysis Made Simple\n")),
       bold(green("==========================================\n")),
       "Version: ", utils::packageVersion("phyloR"), "\n",
       "Author : Feifei Li & Bo Li\n",
-      "Help   : type ", bold(blue("?phyloR")), " to get started.\n"
+      "Help   : type ", bold(blue("help(package = 'phyloR')")), " to get started.\n"
     )
   } else {
     packageStartupMessage(

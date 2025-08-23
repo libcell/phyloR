@@ -6,10 +6,10 @@
 #'
 #' @param gene_ids A character vector of gene identifiers (e.g., KO IDs, NCBI gene IDs, or KEGG gene IDs).
 #' @param id.type A character string indicating the type of the provided gene IDs.
-#'                Options are "KO_id", "ncbi_id", or "kegg_id" (default is "KO_id").
+#'                Options are "ko_id", "ncbi_id", or "kegg_id" (default is "ko_id").
 #' @param seq.type A character string specifying the type of sequence to retrieve.
 #'                 Options are "DNA" or "protein" (default is "protein").
-#' @param species.list A character vector of species names to filter results by species.Normally not NULL only if gene_ids is "KO_id".
+#' @param species.list A character vector of species names to filter results by species.Normally not NULL only if gene_ids is "ko_id".
 #'                     If NULL, no filtering is applied (default is NULL).
 #' @param species.type A character string specifying the type of species identifier.
 #'                     Options are "scientificname", "taxonomic_id", or "abbspname" (default is "scientificname").
@@ -24,7 +24,7 @@
 #' @examples
 #' # Example 1: Retrieve protein sequences for a list of KO IDs
 #' seq_set1 <- get_kegg_sequences(gene_ids = "K00161",
-#'                                id.type = "KO_id",
+#'                                id.type = "ko_id",
 #'                                seq.type = "DNA",
 #'                                species.list = c("hsa", "ptr"),
 #'                                species.type = "abbspname")
@@ -129,8 +129,12 @@ get_kegg_sequences <- function(gene_ids,
     }
   }
 
-  # KO_id handling
-  if(id.type == "KO_id"){
+  # Process all input type
+  id.type <- toupper(id.type)
+  seq.type <- toupper(seq.type)
+
+  # ko_id handling
+  if(id.type == "KO_ID"){
     gene_ids <- toupper(gene_ids)
 
     # Check if gene_ids are valid in KO_list
@@ -183,31 +187,46 @@ get_kegg_sequences <- function(gene_ids,
     kegg_id <- paste(tolower(select.list[, 3]), select.list[, 1], sep = ":")
 
     # Retrieve the sequence (DNA or protein)
-    if(toupper(seq.type) == "DNA"){
+    if(seq.type == "DNA"){
       ntseq <- NULL
       for (i in 1:length(kegg_id)) {
         seq <- KEGGREST::keggGet(kegg_id[i], option = "ntseq")
         ntseq <- c(ntseq, seq)
         Sys.sleep(0.34)
       }
+      names(ntseq) <- kegg_id
       return(ntseq)
     }
-    if(tolower(seq.type) == "protein"){
+    if(seq.type == "PROTEIN"){
       aaseq <- NULL
       for (i in 1:length(kegg_id)) {
         seq <- KEGGREST::keggGet(kegg_id[i], option = "aaseq")
         aaseq <- c(aaseq, seq)
         Sys.sleep(0.34)
       }
+      names(aaseq) <- kegg_id
       return(aaseq)
     }
-    if(!(seq.type %in% c("DNA", "protein", "dna", "Protein"))){
+    if(!(seq.type %in% c("DNA", "PROTEIN"))){
       stop("Unknown sequence type, please choose 'DNA' or 'protein'")
     }
   }
 
   # NCBI gene ID handling
-  if(id.type == "ncbi_id"){
+  if(id.type == "NCBI_ID"){
+    valid_genes <- sapply(gene_ids, function(gene_id) {
+      tryCatch({
+        rentrez::entrez_summary(db = "gene", id = gene_id)
+        TRUE
+      }, error = function(e) {
+        FALSE
+      })
+    })
+    invalid_genes <- gene_ids[!valid_genes]
+    if (length(invalid_genes) > 0) {
+      warning(paste0("No valid gene_id found: ", invalid_genes))
+    }
+    gene_ids <- gene_ids[valid_genes]
     ntseq <- NULL
     aaseq <- NULL
     seq <- NULL
@@ -244,44 +263,63 @@ get_kegg_sequences <- function(gene_ids,
           kegg_id <- kegg_id2
         }
       }
-      if(toupper(seq.type) == "DNA"){
+      if(seq.type == "DNA"){
         ntseq <- KEGGREST::keggGet(kegg_id, option = "ntseq")
         return(ntseq)
       }
-      if(tolower(seq.type) == "protein"){
+      if(seq.type == "PROTEIN"){
         aaseq <- KEGGREST::keggGet(kegg_id, option = "aaseq")
         return(aaseq)
       }
-      if(!(seq.type %in% c("DNA", "protein", "dna", "Protein"))){
+      if(!(seq.type %in% c("DNA", "PROTEIN"))){
         stop("Unknown sequence type, please choose 'DNA' or 'protein'")
       }
+      names(seq) <- kegg_id
     }, cl = 2)
     seq <- unlist(seq)
     return(seq)
   }
 
   # KEGG ID handling
-  if(id.type == "kegg_id"){
+  if(id.type == "KEGG_ID"){
+    valid_genes <- sapply(gene_ids, function(gene_id) {
+      tryCatch({
+        KEGGREST::keggGet(gene_id)
+        TRUE
+      }, error = function(e) {
+        FALSE
+      })
+    })
+    invalid_genes <- gene_ids[!valid_genes]
+    if (length(invalid_genes) > 0) {
+      warning(paste0("No valid gene_id found: ", invalid_genes))
+    }
+    gene_ids <- gene_ids[valid_genes]
+
     ntseq <- NULL
     aaseq <- NULL
     seq <- NULL
     seq <- pbapply::pblapply(1:length(gene_ids), function(i) {
-      if(toupper(seq.type) == "DNA"){
+      if (!valid_genes[i]) {
+        return(NULL)
+      }
+      if(seq.type == "DNA"){
         ntseq <- KEGGREST::keggGet(gene_ids[i], option = "ntseq")
         return(ntseq)
       }
-      if(tolower(seq.type) == "protein"){
+      if(seq.type == "PROTEIN"){
         aaseq <- KEGGREST::keggGet(gene_ids[i], option = "aaseq")
         return(aaseq)
       }
-      if(!(seq.type %in% c("DNA", "protein", "dna", "Protein"))){
+      if(!(seq.type %in% c("DNA", "PROTEIN"))){
         stop("Unknown sequence type, please choose 'DNA' or 'protein'")
       }
     }, cl = 2)
     seq <- unlist(seq)
+    names(seq) <- gene_ids[valid_genes]
+    return(seq)
   }
-  if(!(id.type) %in% c("KO_id", "ncbi_id", "kegg_id")) {
-    warning("Please ensure that id.type is 'KO_id', 'ncbi_id' or 'kegg_id'!")
+  if(!(id.type) %in% c("KO_ID", "NCBI_ID", "KEGG_ID")) {
+    warning("Please ensure that id.type is 'ko_id', 'ncbi_id' or 'kegg_id'!")
   }
-  return(seq)
 }

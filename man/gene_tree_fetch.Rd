@@ -6,7 +6,7 @@
 \usage{
 gene_tree_fetch(
   gene_id,
-  id.type = "KO_id",
+  id.type = "ko_id",
   species.list,
   species.type = "scientificname",
   seq.type = "DNA",
@@ -16,9 +16,9 @@ gene_tree_fetch(
 )
 }
 \arguments{
-\item{gene_id}{A string specifying the gene identifier (e.g., KO_id).}
+\item{gene_id}{A string specifying the gene identifier (e.g., ko_id).}
 
-\item{id.type}{The type of gene ID used(e.g., KO_id, ncbi_id, or kegg_id), default is "KO_id" (KEGG Orthology ID).}
+\item{id.type}{The type of gene ID used(e.g., ko_id, ncbi_id, or kegg_id), default is "ko_id" (KEGG Orthology ID).}
 
 \item{species.list}{A character vector specifying the species to be included in the analysis.
 If NULL, all species available for each gene ID will be used.}

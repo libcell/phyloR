@@ -1,9 +1,9 @@
 #' Get Orthologs for a Gene
 #'
-#' It retrieves orthologous genes for a given gene ID. The function supports different gene ID types (KO_id, ncbi_id, kegg_id) and allows filtering by species.
+#' It retrieves orthologous genes for a given gene ID. The function supports different gene ID types (ko_id, ncbi_id, kegg_id) and allows filtering by species.
 #'
-#' @param gene_id A character string specifying the gene identifier (e.g., KO_id, ncbi_id, or kegg_id).
-#' @param id.type A character string specifying the type of the gene identifier. Options are "KO_id", "ncbi_id", and "kegg_id". Default is "KO_id".
+#' @param gene_id A character string specifying the gene identifier (e.g., ko_id, ncbi_id, or kegg_id).
+#' @param id.type A character string specifying the type of the gene identifier. Options are "ko_id", "ncbi_id", and "kegg_id". Default is "ko_id".
 #' @param species.list A character vector or string specifying the species or species identifiers to filter the results. Default is NULL.
 #' @param species.type A character string specifying the type of species identifier. Options are "scientificname", "taxonomic_id", and "abbspname". Default is "scientificname".
 #'
@@ -15,7 +15,7 @@
 #'
 #' @examples
 #' taxinfo1 <- get_orthologs(gene_id = "K00161",
-#'                           id.type = "KO_id",
+#'                           id.type = "ko_id",
 #'                           species.list = "Homo sapiens",
 #'                           species.type = "scientificname")
 #
@@ -31,7 +31,7 @@
 #'
 #' @export
 get_orthologs <- function(gene_id,
-                          id.type = "KO_id",
+                          id.type = "ko_id",
                           species.list = NULL,
                           species.type = "scientificname") {
 
@@ -117,11 +117,14 @@ get_orthologs <- function(gene_id,
     }
   }
 
-  # If the gene_id is KO_id
-  if(id.type == "KO_id") {
+  # Process input type
+  id.type <- toupper(id.type)
+
+  # If the gene_id is ko_id
+  if(id.type == "KO_ID") {
     gene_id <- as.character(toupper(gene_id))
 
-    # Check if gene_ids are valid in KO_list
+    # Check if gene_id are valid in KO_list
     if(length(grep(gene_id, ko_ids)) != 0) {
       gene_id <- gene_id
     } else {
@@ -170,7 +173,16 @@ get_orthologs <- function(gene_id,
   }
 
   # If the gene_id is ncbi_id
-  if (id.type == "ncbi_id") {
+  if (id.type == "NCBI_ID") {
+    res <- tryCatch({
+      rentrez::entrez_summary(db = "gene", id = gene_id)
+      TRUE
+    }, error = function(e) {
+      FALSE
+    })
+    if (res == FALSE) {
+      warning(paste0("No valid gene_id found: ", gene_id))
+    }
     summary <- rentrez::entrez_summary(db = "gene", id = gene_id)
     otheraliases <- summary$otheraliases
     spname <- summary$organism$scientificname
@@ -242,7 +254,16 @@ get_orthologs <- function(gene_id,
   }
 
   # If the gene_id is kegg_id
-  if(id.type == "kegg_id") {
+  if(id.type == "KEGG_ID") {
+    res <- tryCatch({
+      KEGGREST::keggGet(gene_id)
+      TRUE
+      }, error = function(e) {
+      FALSE
+    })
+    if (res == FALSE) {
+      warning(paste0("No valid gene_id found: ", gene_id))
+    }
     gene_infor <- KEGGREST::keggGet(gene_id)
     ko <- gene_infor[[1]]$ORTHOLOGY
     ko_id <- names(ko)
@@ -283,8 +304,8 @@ get_orthologs <- function(gene_id,
   }
 
   # Return an error if the id.type is not valid
-  if(!(id.type) %in% c("KO_id", "ncbi_id", "kegg_id")) {
-    warning("Please ensure that id.type is 'KO_id', 'ncbi_id' or 'kegg_id'!")
+  if(!(id.type) %in% c("KO_ID", "NCBI_ID", "KEGG_ID")) {
+    warning("Please ensure that id.type is 'ko_id', 'ncbi_id' or 'kegg_id'!")
   }
 }
 

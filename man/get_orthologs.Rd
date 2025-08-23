@@ -6,15 +6,15 @@
 \usage{
 get_orthologs(
   gene_id,
-  id.type = "KO_id",
+  id.type = "ko_id",
   species.list = NULL,
   species.type = "scientificname"
 )
 }
 \arguments{
-\item{gene_id}{A character string specifying the gene identifier (e.g., KO_id, ncbi_id, or kegg_id).}
+\item{gene_id}{A character string specifying the gene identifier (e.g., ko_id, ncbi_id, or kegg_id).}
 
-\item{id.type}{A character string specifying the type of the gene identifier. Options are "KO_id", "ncbi_id", and "kegg_id". Default is "KO_id".}
+\item{id.type}{A character string specifying the type of the gene identifier. Options are "ko_id", "ncbi_id", and "kegg_id". Default is "ko_id".}
 
 \item{species.list}{A character vector or string specifying the species or species identifiers to filter the results. Default is NULL.}
 
@@ -24,11 +24,11 @@ get_orthologs(
 A data frame containing the orthologous genes with columns for Entrez ID, Gene Symbol, and Species. If species is specified, only the orthologs for that species will be returned.
 }
 \description{
-It retrieves orthologous genes for a given gene ID. The function supports different gene ID types (KO_id, ncbi_id, kegg_id) and allows filtering by species.
+It retrieves orthologous genes for a given gene ID. The function supports different gene ID types (ko_id, ncbi_id, kegg_id) and allows filtering by species.
 }
 \examples{
 taxinfo1 <- get_orthologs(gene_id = "K00161",
-                          id.type = "KO_id",
+                          id.type = "ko_id",
                           species.list = "Homo sapiens",
                           species.type = "scientificname")
 taxinfo2 <- get_orthologs(gene_id = "5160",

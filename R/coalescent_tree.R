@@ -43,7 +43,7 @@
 #'          "K00820", "K06158", "K00008")
 #' data_dir <- system.file("extdata", "sequences", package = "phyloR")
 #' tree1 <- coalescent_tree(seq.file = dna,
-#'                          seq.type = "protein",
+#'                          seq.type = "DNA",
 #'                          data_dir = data_dir,
 #'                          tree_method = "NJ",
 #'                          show_tree = TRUE)
@@ -64,14 +64,22 @@ coalescent_tree <- function(seq.files,
     stop("Please input a valid 'data_dir'.")
   }
 
+  # Process input type
+  seq.type <- toupper(seq.type)
+
   mtree <- list()
 
   # Loop through sequence files
   for (i in seq_along(seq.files)) {
     seq.file <- paste0(data_dir, "/", seq.files[i], ".fas")
 
+    # Check if the sequence file exists
+    if (!file.exists(seq.file)) {
+      warning("File not found: ", seq.files[i])
+    }
+
     # DNA sequence processing
-    if (toupper(seq.type) == "DNA") {
+    if (seq.type == "DNA") {
       dna <- adegenet::fasta2DNAbin(seq.file)
 
       # Tree construction based on the selected method for DNA sequences
@@ -111,7 +119,7 @@ coalescent_tree <- function(seq.files,
               beastierinstall::install_beast2()
               message("BEAST2 installation was successful!")
             }, error = function(e) {
-              message("Installation failed: ", e$message)
+              message("No installation required: ", e$message)
             })
           }
         }
@@ -122,29 +130,27 @@ coalescent_tree <- function(seq.files,
         outputs <- babette::bbt_run_from_model(seq.file,
                                                inference_model = beautier::create_inference_model(),
                                                beast2_options = beastier::create_beast2_options())
-        valid_extensions <- c("fas", "fasta")
         file_extension <- tools::file_ext(seq.file)
-        if (!(file_extension %in% valid_extensions)) {
-          stop(paste("Invalid file extension for", seq.file, ". Only 'fas' and 'fasta' files are allowed."))
-        }
-        if(file_extension == "fas"){
-          file_name <- sub("\\.fas$", "", basename(seq.file))
-        }
-        if(file_extension == "fasta"){
-          file_name <- sub("\\.fasta$", "", basename(seq.file))
-        }
+        if (!(file_extension %in% c("fas", "fasta"))) {
+          stop("Invalid file extension.")
+          }
+        file_name <- sub("\\.(fas|fasta)$", "", basename(seq.file))
         tmp <- paste(file_name, "trees", sep = "_")
         treeBI <- outputs[[tmp]][[which.max(outputs$estimates$posterior)]]
         con.trees <- outputs[[tmp]][3:length(outputs[[tmp]])]
         posterior <- round(ape::prop.clades(treeBI, con.trees)/9999*100)
         pml <- treeBI
+
+        # Delete all .log and .trees files
+        unlink(list.files(pattern = "\\.(log|trees)$"), recursive = TRUE)
+
       } else {
         stop("Unknown tree method. Please choose 'ML', 'NJ', 'UPGMA', 'MP', or 'BI'.")
       }
 
       mtree[[i]] <- pml
 
-    } else if (tolower(seq.type) == "protein") {
+    } else if (seq.type == "PROTEIN") {
 
       # Protein sequence processing
       protein <- adegenet::fasta2DNAbin(seq.file)
@@ -186,7 +192,7 @@ coalescent_tree <- function(seq.files,
               beastierinstall::install_beast2()
               message("BEAST2 installation was successful!")
             }, error = function(e) {
-              message("Installation failed: ", e$message)
+              message("No installation required: ", e$message)
             })
           }
         }
@@ -197,22 +203,20 @@ coalescent_tree <- function(seq.files,
         outputs <- babette::bbt_run_from_model(seq.file,
                                                inference_model = beautier::create_inference_model(),
                                                beast2_options = beastier::create_beast2_options())
-        valid_extensions <- c("fas", "fasta")
         file_extension <- tools::file_ext(seq.file)
-        if (!(file_extension %in% valid_extensions)) {
-          stop(paste("Invalid file extension for", seq.file, ". Only 'fas' and 'fasta' files are allowed."))
+        if (!(file_extension %in% c("fas", "fasta"))) {
+          stop("Invalid file extension.")
         }
-        if(file_extension == "fas"){
-          file_name <- sub("\\.fas$", "", basename(seq.file))
-        }
-        if(file_extension == "fasta"){
-          file_name <- sub("\\.fasta$", "", basename(seq.file))
-        }
+        file_name <- sub("\\.(fas|fasta)$", "", basename(seq.file))
         tmp <- paste(file_name, "trees", sep = "_")
         treeBI <- outputs[[tmp]][[which.max(outputs$estimates$posterior)]]
         con.trees <- outputs[[tmp]][3:length(outputs[[tmp]])]
         posterior <- round(ape::prop.clades(treeBI, con.trees)/9999*100)
         pml <- treeBI
+
+        # Delete all .log and .trees files
+        unlink(list.files(pattern = "\\.(log|trees)$"), recursive = TRUE)
+
       } else {
         stop("Unknown tree method. Please choose 'ML', 'NJ', 'UPGMA', 'MP', or 'BI'.")
       }
@@ -226,7 +230,6 @@ coalescent_tree <- function(seq.files,
   # Combine individual trees into a supertree
   class(mtree) <- "multiPhylo"
   supertree <- phangorn::superTree(mtree)
-
   # Plot or return the supertree based on the `show_tree` parameter
   if(show_tree == TRUE){
     plot(supertree)
