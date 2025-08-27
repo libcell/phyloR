@@ -6,6 +6,8 @@
 [![License: GPL-3](https://img.shields.io/badge/license-GPL--3-red.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
 [![codecov](https://codecov.io/gh/libcell/phyloR/branch/main/graph/badge.svg)](https://codecov.io/gh/libcell/phyloR)
+[![codecov](https://codecov.io/gh/libcell/phyloR/branch/main/graph/badge.svg)](https://codecov.io/gh/libcell/phyloR)
+[![Codecov](https://codecov.io/github/libcell/phyloR/coverage.svg?branch=main)](https://codecov.io/github/libcell/phyloR?branch=main)
 
 ## Phylogenetic Analysis Toolkit for R
 
