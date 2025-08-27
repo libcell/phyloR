@@ -3,8 +3,9 @@
 
 # phyloR: An Automated R Package for Sequence Retrievd and Phylogenetic Analysis in Ecological and Environment Genomics.
 
-[![License: GPL-3](https://img.shields.io/badge/license-GPL--3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
+[![License: GPL-3](https://img.shields.io/badge/license-GPL--3-red.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+[![codecov](https://codecov.io/gh/libcell/phyloR/branch/main/graph/badge.svg)](https://codecov.io/gh/libcell/phyloR)
 
 ## Phylogenetic Analysis Toolkit for R
 
