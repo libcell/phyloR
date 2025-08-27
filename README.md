@@ -8,6 +8,7 @@
 [![codecov](https://codecov.io/gh/libcell/phyloR/branch/main/graph/badge.svg)](https://codecov.io/gh/libcell/phyloR)
 [![codecov](https://codecov.io/gh/libcell/phyloR/branch/main/graph/badge.svg)](https://codecov.io/gh/libcell/phyloR)
 [![Codecov](https://codecov.io/github/libcell/phyloR/coverage.svg?branch=main)](https://codecov.io/github/libcell/phyloR?branch=main)
+[![Codecov](https://codecov.io/github/ropensci/drake/coverage.svg?branch=master)](https://codecov.io/github/ropensci/drake?branch=master)
 
 ## Phylogenetic Analysis Toolkit for R
 
