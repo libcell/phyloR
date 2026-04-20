@@ -14,9 +14,8 @@
 
 - 🧬 Ortholog identification from major databases
 - 🔍 Multiple sequence alignment and trimming
-- 🌳 Phylogenetic tree construction (ML/NJ/MP)
+- 🌳 Phylogenetic tree construction (ML/NJ/MP/BI)
 - ↔️ Tree comparison and visualization
-- 📊 Integrated tidyverse compatibility
 
 ## Installation
 
@@ -117,16 +116,7 @@ tree <- gene_tree_fetch(gene_id = "K00826",
 | 🌳 Tree Construction   | `vignette("tree-building")`       |
 | ↔️ Tree Comparison        | `vignette("tree-comparison")`     |
 
-### Online Resources
-- [ [WEB] Website Docs ](https://libcell.github.io/phyloR/)
-- [ [PDF] User Manual ](docs/phyloR_manual.pdf)
-- [ [VID] Tutorial Videos ](https://youtube.com/playlist?list=XXX)
 
 ## Contact
 
 If you have any question, please email to Feifei Li (<libcell@cqnu.edu.cn>) or raise an issue for that.
-
-## Citation
-If you use phyloR in your research, please cite the following publication:
-
-Zou Y, Zhang Z, Zeng Y, *et al*. Common methods for phylogenetic tree construction and their implementation in R. ***Bioengineering***, 2024, 11(5): 480. 
