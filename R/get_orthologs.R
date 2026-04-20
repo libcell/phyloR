@@ -37,6 +37,7 @@ get_orthologs <- function(gene_id,
 
   # Function to select species from the ortholog list based on given species names or identifiers
   select.species <- function(ortholog.list, species, species.type = "scientificname"){
+    species.type <- tolower(species.type)
     # Search for species based on the species type
     if(species.type == "scientificname"){
       find.sciname <- function(a) {which(species_tbl[, 4] == a)}

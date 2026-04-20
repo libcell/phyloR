@@ -17,6 +17,7 @@
 #' @param tree_method The method for constructing the phylogenetic tree. Options include:
 #'        "ML" (Maximum Likelihood), "NJ" (Neighbor Joining), "UPGMA", "MP" (Maximum Parsimony),
 #'        and "BI" (Bayesian Inference). Default is "ML".
+#' @param root Character string or NULL, specify outgroup for rooting. If NULL, automatic outgroup selection is performed
 #' @param show_tree Logical, if TRUE the constructed tree is displayed using a suitable tree plotting method.
 #'        Default is TRUE.
 #'
@@ -30,9 +31,9 @@
 #'   4. Optionally, displays the tree if the `show_tree` parameter is set to TRUE.
 #'   5. Cleans up temporary files and directories after tree construction.
 #'
-#' @importFrom ape dist.dna njs dist.aa di2multi prop.clades
+#' @importFrom ape dist.dna njs dist.aa di2multi prop.clades root is.rooted keep.tip
 #' @importFrom adegenet fasta2DNAbin
-#' @importFrom phangorn as.phyDat pratchet acctran modelTest pml_bb upgma
+#' @importFrom phangorn as.phyDat pratchet acctran modelTest pml_bb upgma midpoint
 #' @importFrom babette bbt_run_from_model
 #' @importFrom beastierinstall install_beast2
 #' @importFrom remotes install_github
@@ -50,6 +51,7 @@
 #'                         species.type = "abbspname",
 #'                         seq.type = "DNA",
 #'                         tree_method = "NJ",
+#'                         root = NULL,
 #'                         show_tree = TRUE)
 #'
 #' @export
@@ -60,6 +62,7 @@ gene_tree_fetch <- function(gene_id,
                             seq.type = "DNA",
                             align_method = "ClustalW",
                             tree_method = "NJ",
+                            root = NULL,
                             show_tree = TRUE){
 
   # Create a new directory for sequences files
@@ -107,7 +110,16 @@ gene_tree_fetch <- function(gene_id,
   seqinr::write.fasta(seq, names = names(seq), file.out = output_path, nbchar = 60)
 
   # Prepare output file path for processed sequences
-  data_file <- paste(gene_id, "fasta", sep = ".")
+  if(toupper(seq.type) == "DNA"){
+    file.name <- paste("nt", gene_id, sep = "_")
+    data_file <- paste(file.name, "fasta", sep = ".")
+  }
+
+  if(toupper(seq.type) == "PROTEIN"){
+    file.name <- paste("aa", gene_id, sep = "_")
+    data_file <- paste(file.name, "fasta", sep = ".")
+  }
+
   output_file <- file.path(temp_dir, data_file)
 
   # Align and trim the sequences using the selected alignment method
@@ -123,6 +135,7 @@ gene_tree_fetch <- function(gene_id,
   tree <- gene_tree(seq.file = output_file,
                     seq.type = seq.type,
                     tree_method = tree_method,
+                    root = root,
                     show_tree = show_tree)
   return(tree)
 

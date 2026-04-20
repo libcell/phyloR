@@ -33,7 +33,6 @@ are returned as a data frame containing the computed similarity values.
 }
 }
 \examples{
-\dontshow{if (requireNamespace("dendextend", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
 # Compare two phylogenetic trees
 DNA_seq <- system.file("extdata", "DNA_seq.fas", package = "phyloR")
 tree1 <- gene_tree(seq.file = DNA_seq,
@@ -45,5 +44,5 @@ species = c("ath", "gmx", "zma", "osa",
             "gga", "xla", "sce", "ece")
 tree2 <- species_tree(species = species, species.type = "abbspname")
 relation <- compare_trees(tree1, tree2)
-\dontshow{\}) # examplesIf}
+
 }

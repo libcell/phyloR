@@ -12,6 +12,9 @@
 #'
 #' @export
 .onAttach <- function(libname, pkgname) {
+  old_warn <- getOption("warn.conflicts")
+  options(warn.conflicts = FALSE)
+
   if (requireNamespace("crayon", quietly = TRUE)) {
     green <- crayon::green
     blue <- crayon::blue
@@ -33,4 +36,18 @@
       "Version: ", utils::packageVersion("phyloR"), "\n"
     )
   }
+
+  options(warn.conflicts = old_warn)
+  invisible()
+}
+
+
+.onLoad <- function(libname, pkgname) {
+  old_opts <- options(warn.conflicts = FALSE)
+  suppressMessages({
+    requireNamespace("dendextend", quietly = TRUE)
+  })
+  assign(".temp_options", old_opts, envir = parent.env(environment()))
+
+  invisible()
 }

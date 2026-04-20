@@ -4,7 +4,13 @@
 \alias{gene_tree}
 \title{Construct Phylogenetic Tree from Processed Single Gene Sequences File}
 \usage{
-gene_tree(seq.file, seq.type = "DNA", tree_method = "NJ", show_tree = TRUE)
+gene_tree(
+  seq.file,
+  seq.type = "DNA",
+  tree_method = "NJ",
+  root = NULL,
+  show_tree = TRUE
+)
 }
 \arguments{
 \item{seq.file}{A string specifying the path to the sequence file (FASTA format).}
@@ -14,6 +20,8 @@ gene_tree(seq.file, seq.type = "DNA", tree_method = "NJ", show_tree = TRUE)
 \item{tree_method}{A string specifying the tree construction method. Options include:
 "NJ" (Neighbor-Joining), "MP" (Maximum-Parsimony), "ML" (Maximum-Likelihood), "UPGMA", "BI" (Bayesian-Inference).
 Default is "NJ".}
+
+\item{root}{Character string or NULL, specify outgroup for rooting. If NULL, automatic outgroup selection is performed}
 
 \item{show_tree}{Logical, if TRUE the constructed phylogenetic tree is displayed. Default is TRUE.}
 }
@@ -48,6 +56,6 @@ tree1 <- gene_tree(seq.file = DNA_seq,
 protein_seq <- system.file("extdata", "protein_seq.fas", package = "phyloR")
 tree2 <- gene_tree(seq.file = protein_seq,
                    seq.type = "protein",
-                   tree_method = "NJ")
+                   tree_method = "UPGMA")
 
 }

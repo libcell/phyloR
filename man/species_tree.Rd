@@ -39,7 +39,7 @@ provided. It then constructs a phylogenetic tree using the taxonomy classificati
 are scientific names, taxonomic IDs, and abbreviated species names.
 }
 \examples{
-\dontshow{if (requireNamespace("taxize", quietly = TRUE)) (if (getRversion() >= "3.4") withAutoprint else force)(\{ # examplesIf}
+
 # Example 1:
 species1 <- c("Homo sapiens", "Pan troglodytes", "Mus musculus",
               "Rattus norvegicus","Canis lupus familiaris", "Felis catus")
@@ -56,5 +56,5 @@ species3 = c("ath", "gmx", "zma", "osa",
              "gga", "xla", "sce", "ece")
 tree3 <- species_tree(species = species3, species.type = "abbspname")
 
-\dontshow{\}) # examplesIf}
+
 }

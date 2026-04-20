@@ -20,7 +20,7 @@
 #' - **Edge Similarity**: This metric measures the proportion of edges that are common between the two trees. It is calculated by comparing the edges of both trees and counting how many are identical.
 #' - **Entanglement Value**: This metric calculates the structural similarity of the trees based on their dendrogram representations. A higher entanglement value indicates a greater similarity in tree structure.
 #'
-#' @examplesIf requireNamespace("dendextend", quietly = TRUE)
+#' @examples
 #' # Compare two phylogenetic trees
 #' DNA_seq <- system.file("extdata", "DNA_seq.fas", package = "phyloR")
 #' tree1 <- gene_tree(seq.file = DNA_seq,
@@ -36,16 +36,10 @@
 #' @importFrom phangorn RF.dist
 #' @importFrom ape Ntip Nnode extract.clade node.depth.edgelength is.ultrametric
 #' @importFrom stats as.dendrogram
+#' @importFrom dendextend dendlist entanglement
 #'
 #' @export
 compare_trees <- function(tree1, tree2) {
-
-  if (!requireNamespace("dendextend", quietly = TRUE)) {
-    stop("This feature needs the 'taxize' package. Please install it.",
-         call. = FALSE)
-  }
-
-  .silently_require("dendextend")
 
   # Ensure both trees are of class 'phylo'
   if (!inherits(tree1, "phylo") || !inherits(tree2, "phylo")) {
@@ -88,14 +82,26 @@ compare_trees <- function(tree1, tree2) {
       tip_depths <- node_depths[1:length(phy$tip.label)]
       max_depth <- max(tip_depths)
       shortage <- max_depth - tip_depths
+
+      # Store the node labels before adjusting tree
+      original_node_labels <- phy$node.label
+
+      # Adjust edge lengths to make tree ultrametric
       for (i in 1:length(phy$tip.label)) {
         edge_index <- which(phy$edge[, 2] == i)
-        aligned_tree$edge.length[edge_index] <- phy$edge.length[edge_index] + shortage[i]
+        if (length(edge_index) > 0) {
+          aligned_tree$edge.length[edge_index] <- phy$edge.length[edge_index] + shortage[i]
+        }
       }
+
+      # Restore the node labels after adjustment
+      aligned_tree$node.label <- original_node_labels
+
       return(aligned_tree)
     }
     tree1 <- align_tip_nodes(tree1)
   }
+
   if(!ape::is.ultrametric(tree2)){
     align_tip_nodes <- function(phy) {
       aligned_tree <- phy
@@ -103,18 +109,38 @@ compare_trees <- function(tree1, tree2) {
       tip_depths <- node_depths[1:length(phy$tip.label)]
       max_depth <- max(tip_depths)
       shortage <- max_depth - tip_depths
+
+      # Store the node labels before adjusting tree
+      original_node_labels <- phy$node.label
+
+      # Adjust edge lengths to make tree ultrametric
       for (i in 1:length(phy$tip.label)) {
         edge_index <- which(phy$edge[, 2] == i)
-        aligned_tree$edge.length[edge_index] <- phy$edge.length[edge_index] + shortage[i]
+        if (length(edge_index) > 0) {
+          aligned_tree$edge.length[edge_index] <- phy$edge.length[edge_index] + shortage[i]
+        }
       }
+
+      # Restore the node labels after adjustment
+      aligned_tree$node.label <- original_node_labels
+
       return(aligned_tree)
     }
     tree2 <- align_tip_nodes(tree2)
   }
 
+
   # Convert trees to dendrogram objects
   dend1 <- stats::as.dendrogram(tree1)
   dend2 <- stats::as.dendrogram(tree2)
+
+  if(length(labels(dend1)) != length(tree1$tip.label)){
+    stop("The tip.label of tree1 are lost!")
+  }
+
+  if(length(labels(dend2)) != length(tree2$tip.label)){
+    stop("The tip.label of tree2 are lost!")
+  }
 
   # Create dendlist and calculate entanglement value
   dend_list <- dendextend::dendlist(dend1, dend2)

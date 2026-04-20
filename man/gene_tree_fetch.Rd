@@ -12,6 +12,7 @@ gene_tree_fetch(
   seq.type = "DNA",
   align_method = "ClustalW",
   tree_method = "NJ",
+  root = NULL,
   show_tree = TRUE
 )
 }
@@ -35,6 +36,8 @@ Options are "ClustalW", "Muscle", "Mafft" or "T-coffee". Default is "ClustalW".}
 \item{tree_method}{The method for constructing the phylogenetic tree. Options include:
 "ML" (Maximum Likelihood), "NJ" (Neighbor Joining), "UPGMA", "MP" (Maximum Parsimony),
 and "BI" (Bayesian Inference). Default is "ML".}
+
+\item{root}{Character string or NULL, specify outgroup for rooting. If NULL, automatic outgroup selection is performed}
 
 \item{show_tree}{Logical, if TRUE the constructed tree is displayed using a suitable tree plotting method.
 Default is TRUE.}
@@ -68,6 +71,7 @@ tree <- gene_tree_fetch(gene_id = "K00826",
                         species.type = "abbspname",
                         seq.type = "DNA",
                         tree_method = "NJ",
+                        root = NULL,
                         show_tree = TRUE)
 
 }

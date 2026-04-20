@@ -19,7 +19,9 @@
 #' @details It retrieves species classification data from a database (e.g., NCBI) based on the species names or IDs
 #' provided. It then constructs a phylogenetic tree using the taxonomy classification. The supported species input types
 #' are scientific names, taxonomic IDs, and abbreviated species names.
-#' @examplesIf requireNamespace("taxize", quietly = TRUE)
+#' @importFrom taxize classification class2tree
+#' @examples
+#'
 #' # Example 1:
 #' species1 <- c("Homo sapiens", "Pan troglodytes", "Mus musculus",
 #'               "Rattus norvegicus","Canis lupus familiaris", "Felis catus")
@@ -42,11 +44,6 @@ species_tree <- function(species,
                          species.type = "scientificname",
                          db = "ncbi",
                          show_tree = TRUE) {
-
-  if (!requireNamespace("taxize", quietly = TRUE)) {
-    stop("This feature needs the 'taxize' package. Please install it.",
-         call. = FALSE)
-  }
 
   # Process based on species type
   if(species.type == "scientificname") {
