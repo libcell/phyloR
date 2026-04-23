@@ -33,12 +33,13 @@ Imports: KEGGREST,
          stats,
          taxize,
          dendextend
-License: GPL-3
+License: GPL-3 | file LICENSE
 Encoding: UTF-8
 LazyData: TRUE
-Suggests: rmarkdown,
-          testthat,
-          knitr
+Suggests: 
+    rmarkdown,
+    testthat (>= 3.0.0),
+    knitr
 Remotes: richelbilderbeek/beastierinstall
 URL: http://github.com/libcell/phyloR
 BugReports: http://github.com/Lifei-9/phyloR/issues
@@ -46,3 +47,4 @@ Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 Config/build/ignore-quarto: true
 RoxygenNote: 7.3.3
+Config/testthat/edition: 3
