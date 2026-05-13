@@ -1,4 +1,4 @@
-Package: phyloR
+Package: phyloPipeR
 Type: Package
 Title: A tool for getting the information of gene and constructing phylogenetic tree
 Version: 0.1.0
@@ -41,8 +41,8 @@ Suggests:
     testthat (>= 3.0.0),
     knitr
 Remotes: richelbilderbeek/beastierinstall
-URL: http://github.com/libcell/phyloR
-BugReports: http://github.com/Lifei-9/phyloR/issues
+URL: http://github.com/libcell/phyloPipeR
+BugReports: http://github.com/Lifei-9/phyloPipeR/issues
 Roxygen: list(markdown = TRUE)
 VignetteBuilder: knitr
 Config/build/ignore-quarto: true

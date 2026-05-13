@@ -61,12 +61,13 @@ get_kegg_sequences <- function(gene_ids,
         number <- unlist(sapply(abbspname[i], find.species))
         if (length(number) == 0) {
           if(length(grep(abbspname[i], toupper(species_tbl[, 3]))) == 0){
-            warning(paste(species[i], "Please ensure that the species name is correct!", sep = ":"))
+            warning(paste("Species", species[i], "was removed because the species name cannot be verified. Please ensure the species name is correct!"))
+          } else {
+            warning(paste("Species", species[i], "was removed because no valid sequence was found in the current gene."))
           }
-          else{
-            warning(paste(species[i], "No valid species found in the current gene.", sep = ":"))
-          }
-          return(NULL)
+          species <- species[-i]
+          i <- i - 1
+          next
         }
         if(length(number >= 1)){
           number <- number[1]
@@ -87,12 +88,13 @@ get_kegg_sequences <- function(gene_ids,
         number <- unlist(sapply(abbspname[i], find.species))
         if (length(number) == 0) {
           if(length(grep(abbspname[i], toupper(species_tbl[, 3]))) == 0){
-            warning(paste(species[i], "Please ensure that the species name is correct!", sep = ":"))
+            warning(paste("Species", species[i], "was removed because the species name cannot be verified. Please ensure the species name is correct!"))
+          } else {
+            warning(paste("Species", species[i], "was removed because no valid sequence was found in the current gene."))
           }
-          else{
-            warning(paste(species[i], "No valid species found in the current gene.", sep = ":"))
-          }
-          return(NULL)
+          species <- species[-i]
+          i <- i - 1
+          next
         }
         if(length(number >= 1)){
           number <- number[1]
@@ -110,12 +112,13 @@ get_kegg_sequences <- function(gene_ids,
         number <- unlist(sapply(abbspname[i], find.species))
         if (length(number) == 0) {
           if(length(grep(abbspname[i], toupper(species_tbl[, 3]))) == 0){
-            warning(paste(species[i], "Please ensure that the species name is correct!", sep = ":"))
+            warning(paste("Species", species[i], "was removed because the species name cannot be verified. Please ensure the species name is correct!"))
+          } else {
+            warning(paste("Species", species[i], "was removed because no valid sequence was found in the current gene."))
           }
-          else{
-            warning(paste(species[i], "No valid species found in the current gene.", sep = ":"))
-          }
-          return(NULL)
+          species <- species[-i]
+          i <- i - 1
+          next
         }
         if(length(number >= 1)){
           number <- number[1]
@@ -224,7 +227,8 @@ get_kegg_sequences <- function(gene_ids,
     })
     invalid_genes <- gene_ids[!valid_genes]
     if (length(invalid_genes) > 0) {
-      warning(paste0("No valid gene_id found: ", invalid_genes))
+      warning(paste0("The following genes have been removed due to invalid gene_id: ",
+                     paste(invalid_genes, collapse = ", ")))
     }
     gene_ids <- gene_ids[valid_genes]
     ntseq <- NULL
@@ -292,7 +296,8 @@ get_kegg_sequences <- function(gene_ids,
     })
     invalid_genes <- gene_ids[!valid_genes]
     if (length(invalid_genes) > 0) {
-      warning(paste0("No valid gene_id found: ", invalid_genes))
+      warning(paste0("The following genes have been removed due to invalid gene_id: ",
+                     paste(invalid_genes, collapse = ", ")))
     }
     gene_ids <- gene_ids[valid_genes]
 

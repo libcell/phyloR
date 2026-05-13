@@ -22,7 +22,7 @@
 #'
 #' @examples
 #' # Compare two phylogenetic trees
-#' DNA_seq <- system.file("extdata", "DNA_seq.fas", package = "phyloR")
+#' DNA_seq <- system.file("extdata", "DNA_seq.fas", package = "phyloPipeR")
 #' tree1 <- gene_tree(seq.file = DNA_seq,
 #'                    seq.type = "DNA",
 #'                    tree_method = "UPGMA")
