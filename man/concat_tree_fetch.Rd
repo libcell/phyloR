@@ -11,7 +11,13 @@ concat_tree_fetch(
   species.type = "scientificname",
   seq.type = "DNA",
   align_method = "ClustalW",
+  gapOpening = "default",
+  gapExtension = "default",
+  maxiters = "default",
+  gap.end = 0.5,
+  gap.mid = 0.9,
   tree_method = "NJ",
+  model = NULL,
   show_tree = TRUE
 )
 }
@@ -27,10 +33,24 @@ If NULL, all species available for each gene ID will be used.}
 default is "scientificname".}
 
 \item{seq.type}{The type of sequence to be retrieved, default is "DNA".
-Other options may include "protein".}
+Other options may include "protein".
+Options are "ClustalW" (default), "Muscle", or "ClustalOmega".}
 
 \item{align_method}{The alignment method to be used, default is "ClustalW".
-Options are "ClustalW", "Muscle", "Mafft" or "T-coffee". Default is "ClustalW".}
+Options are "ClustalW", "Muscle" or "ClustalOmega". Default is "ClustalW".}
+
+\item{gapOpening}{The penalty for opening a gap in the alignment.
+Default is "default", which uses algorithm-specific default values.}
+
+\item{gapExtension}{The penalty for extending an existing gap.
+Default is "default", which uses algorithm-specific default values.}
+
+\item{maxiters}{The maximum number of refinement iterations.
+Default is "default", which uses algorithm-specific default values.}
+
+\item{gap.end}{Fraction of gaps tolerated at the ends of the alignment (0-1). Default is 0.5.}
+
+\item{gap.mid}{Fraction of gaps tolerated inside the alignment (0-1). Default is 0.9.}
 
 \item{tree_method}{The method for constructing the phylogenetic tree. Options include:
 "ML" (Maximum Likelihood), "NJ" (Neighbor Joining), "UPGMA", "MP" (Maximum Parsimony),
@@ -59,6 +79,7 @@ It performs the following steps:
 }
 }
 \examples{
+\dontrun{
 tree <- concat_tree_fetch(gene_ids = c("K00820", "K00088", "K00927",
                                        "K06158", "K00008","K00164",
                                        "K00797", "K01939", "K02257",
@@ -71,6 +92,7 @@ tree <- concat_tree_fetch(gene_ids = c("K00820", "K00088", "K00927",
                           species.type = "abbspname",
                           seq.type = "DNA",
                           tree_method = "UPGMA")
+}
 
 
 }

@@ -9,6 +9,7 @@ coalescent_tree(
   data_dir = NULL,
   seq.type = "DNA",
   tree_method = "ML",
+  model = NULL,
   show_tree = TRUE
 )
 }
@@ -25,14 +26,18 @@ Default is "DNA".}
 "ML" (Maximum Likelihood), "NJ" (Neighbor Joining), "UPGMA", "MP" (Maximum Parsimony),
 and "BI" (Bayesian Inference). Default is "ML".}
 
+\item{model}{The evolutionary model to use for tree construction. For DNA sequences with ML method,
+options include "all", "JC", "F81", "K80", "HKY", "SYM", "GTR". For DNA sequences with NJ/UPGMA,
+options include "raw", "N", "TS", "TV", "JC69", "K80", "F81", "K81", "F84", "BH87", "T92",
+"TN93", "GG95", "logdet", "paralin", "indel", "indelblock". For DNA sequences with BI method,
+options include "JC69", "HKY", "TN93", "GTR". For protein sequences with ML method,
+options include "all", "JTT", "WAG", "LG". Default is NULL (auto-selected).}
+
 \item{show_tree}{Logical, if TRUE the constructed supertree is displayed. Default is TRUE.}
 }
 \value{
 A phylogenetic tree object (of class \code{phylo}), representing the supertree constructed from
-the individual trees built from the sequence files.
-
-If \code{show_tree} is TRUE, the function plots the coalescence tree.
-If FALSE, it returns the constructed phylogenetic tree as a "multiPhylo" object.
+the individual trees built from the sequence files. If \code{show_tree} is TRUE, the tree is plotted.
 }
 \description{
 It constructs a phylogenetic tree from multiple sequence files with coalescent method,
@@ -43,27 +48,29 @@ based on the specified method, and combines them into a supertree.
 The tree can be displayed if specified.
 }
 \details{
-It performs the following steps:
+This function performs the following steps:
 \enumerate{
 \item Retrieves sequence data from the provided files and processes them based on the specified sequence type.
 \item Builds an individual phylogenetic tree for each sequence file using the chosen tree-building method.
-\item Combines the individual trees into a supertree.
+\item Combines the individual trees into a supertree using the superTree function.
 \item Optionally, displays the supertree if the \code{show_tree} parameter is TRUE.
 \item Returns the supertree object.
 }
 }
 \examples{
+\dontrun{
 dna <- c("K01939", "K03644", "K00797", "K00927", "K00088", "K02257", "K00164",
          "K00820", "K06158", "K00008")
-data_dir <- system.file("extdata", "sequences", package = "phyloR")
-tree1 <- coalescent_tree(seq.file = dna,
+data_dir <- system.file("extdata", "sequences", package = "phyloPipeR")
+tree1 <- coalescent_tree(seq.files = dna,
                          seq.type = "DNA",
                          data_dir = data_dir,
                          tree_method = "NJ",
                          show_tree = TRUE)
-tree2 <- coalescent_tree(seq.file = dna,
+tree2 <- coalescent_tree(seq.files = dna,
                          seq.type = "DNA",
                          data_dir = data_dir,
                          tree_method = "UPGMA")
+}
 
 }

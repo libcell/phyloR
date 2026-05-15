@@ -5,10 +5,10 @@ knitr::opts_chunk$set(
 )
 
 ## ----install-github-devtools, eval=FALSE-----------------------------------------------------------
-# remotes::install_github("libcell/phyloR")
-# 
+# remotes::install_github("libcell/phyloPipeR")
+#
 
 ## ----setup, include=FALSE--------------------------------------------------------------------------
-library(phyloR)  
+library(phyloPipeR)
 
 

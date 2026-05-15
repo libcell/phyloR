@@ -1,6 +1,6 @@
-#' .onAttach function for the 'phyloR' package
+#' .onAttach function for the 'phyloPipeR' package
 #'
-#' It is executed when the 'phyloR' package is loaded. It checks if the 'crayon' package
+#' It is executed when the 'phyloPipeR' package is loaded. It checks if the 'crayon' package
 #' is available to display a colorful welcome message. If 'crayon' is not found, a simpler message
 #' is shown.
 #'
@@ -23,17 +23,17 @@
 
     packageStartupMessage(
       "\n", bold(green("==========================================\n")),
-      bold(blue("       \U1F33F Welcome to phyloR \U1F33F\n")),
+      bold(blue("       \U1F33F Welcome to phyloPipeR \U1F33F\n")),
       bold(magenta("  Phylogenetic Analysis Made Simple\n")),
       bold(green("==========================================\n")),
-      "Version: ", utils::packageVersion("phyloR"), "\n",
+      "Version: ", utils::packageVersion("phyloPipeR"), "\n",
       "Author : Feifei Li & Bo Li\n",
-      "Help   : type ", bold(blue("help(package = 'phyloR')")), " to get started.\n"
+      "Help   : type ", bold(blue("help(package = 'phyloPipeR')")), " to get started.\n"
     )
   } else {
     packageStartupMessage(
-      "\n*** Welcome to phyloR ***\n",
-      "Version: ", utils::packageVersion("phyloR"), "\n"
+      "\n*** Welcome to phyloPipeR ***\n",
+      "Version: ", utils::packageVersion("phyloPipeR"), "\n"
     )
   }
 

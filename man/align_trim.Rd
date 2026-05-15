@@ -4,35 +4,85 @@
 \alias{align_trim}
 \title{Align and Trim DNA or Protein Sequences}
 \usage{
-align_trim(seq.file, seq.type = "DNA", method = "ClustalW", output_file = NULL)
+align_trim(
+  seq.file,
+  seq.type = "DNA",
+  method = "ClustalW",
+  gapOpening = "default",
+  gapExtension = "default",
+  maxiters = "default",
+  gap.end = 0.5,
+  gap.mid = 0.9,
+  output_file = NULL
+)
 }
 \arguments{
-\item{seq.file}{A character string specifying the path to the input sequence file (FASTA format).}
+\item{seq.file}{A character string specifying the path to the input sequence file.
+The file must be in FASTA format (extensions: .fas, .fasta, or .fa).}
 
-\item{seq.type}{A character string specifying the type of sequences. Options are "DNA" or "protein".
-Default is "DNA".}
+\item{seq.type}{A character string specifying the type of sequences. Options are "DNA" (default) or "PROTEIN".
+Case-insensitive (e.g., "dna", "DNA", "protein" are all accepted).}
 
-\item{method}{A character string specifying the alignment method to use. Options are "ClustalW", "Muscle", "Mafft" or "T-coffee".
-Default is "ClustalW".}
+\item{method}{A character string specifying the alignment method to use.
+Options are "ClustalW" (default), "Muscle", or "ClustalOmega".}
 
-\item{output_file}{A character string specifying the path to the output file where the trimmed alignment will be saved.
-If NULL (default), the function returns the trimmed alignment as a sequence object.}
+\item{gapOpening}{The penalty for opening a gap in the alignment.
+Default is "default", which uses algorithm-specific default values.}
+
+\item{gapExtension}{The penalty for extending an existing gap.
+Default is "default", which uses algorithm-specific default values.}
+
+\item{maxiters}{The maximum number of refinement iterations.
+Default is "default", which uses algorithm-specific default values.}
+
+\item{gap.end}{Fraction of gaps tolerated at the ends of the alignment (0-1). Default is 0.5.}
+
+\item{gap.mid}{Fraction of gaps tolerated inside the alignment (0-1). Default is 0.9.}
+
+\item{output_file}{A character string specifying the path to the output file where the
+trimmed alignment will be saved in FASTA format. If NULL (default), the function
+returns the trimmed alignment as an R object. If the file already exists, the user
+will be prompted to confirm overwriting.}
 }
 \value{
-If \code{output_file} is NULL, returns the trimmed alignment as an object of class \code{DNAMultipleAlignment} or \code{AAMultipleAlignment},
-depending on the sequence type. Otherwise, the trimmed alignment is written to the specified output file.
+If \code{output_file} is NULL, returns a data frame (from \code{microseq::readFasta}) containing
+the trimmed alignment with two columns: \code{Header} (sequence names) and \code{Sequence}
+(trimmed sequence strings). If \code{output_file} is specified, the function writes the
+trimmed alignment to the file and returns nothing (invisible NULL).
 }
 \description{
-It reads DNA or protein sequences from a file, aligns them using a selected alignment method, trims the alignment,
-and optionally saves the trimmed alignment to a file.
+Performs multiple sequence alignment using specified algorithms (ClustalW, MUSCLE, or ClustalOmega),
+then trims the alignment by removing gap-rich regions from both ends and internal positions.
+The function supports both DNA and protein sequences and can either return the trimmed alignment
+as an R object or save it directly to a FASTA file.
+}
+\details{
+The function internally uses \code{msa::msa()} for multiple sequence alignment. The alignment
+result is then converted to a format compatible with \code{bios2mds::export.fasta()} via
+\code{msa::msaConvert()}, temporarily written to disk as "alignment.fas", and read back by
+\code{microseq::readFasta()} for trimming. The temporary file is automatically removed after use.
+
+Trimming is performed by \code{microseq::msaTrim()}, which removes:
+\itemize{
+\item Columns from the ends where gap proportion exceeds \code{gap.end}
+\item Internal columns where gap proportion exceeds \code{gap.mid}
+}
 }
 \examples{
 # Align and trim DNA sequences
-DNA_seq <- system.file("extdata", "DNA_sequences.fas", package = "phyloR")
-align_trim(DNA_seq, seq.type = "DNA", method = "ClustalW")
+DNA_seq <- system.file("extdata", "DNA_sequences.fas", package = "phyloPipeR")
+align_trim(DNA_seq,
+           seq.type = "DNA",
+           method = "ClustalW",
+           gapOpening = 10,
+           gapExtension = 5)
 
 # Align and trim protein sequences
-protein_seq <- system.file("extdata", "protein_sequences.fas", package = "phyloR")
-align_trim(protein_seq, seq.type = "protein", method = "ClustalW")
+protein_seq <- system.file("extdata", "protein_sequences.fas", package = "phyloPipeR")
+align_trim(protein_file,
+           seq.type = "PROTEIN",
+           method = "Muscle",
+           gap.end = 0.3,
+           gap.mid = 0.95)
 
 }

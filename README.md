@@ -1,16 +1,16 @@
 
-<img src="man/figures/phyloR_logo.png" align="right" width = "158px" height="183px"/>
+<img src="man/figures/phyloPipeR_logo.png" align="right" width = "158px" height="183px"/>
 
-# phyloR: An Automated R Package for Sequence Retrievd and Phylogenetic Analysis in Ecological and Environment Genomics.
+# phyloPipeR: An Automated R Package for Sequence Retrievd and Phylogenetic Analysis in Ecological and Environment Genomics.
 
 [![License: GPL-3](https://img.shields.io/badge/license-GPL--3-red.svg)](https://www.gnu.org/licenses/gpl-3.0.en.html)
-[![Coverage: 100%](https://img.shields.io/badge/codecov-100%25-brightreegn.svg)](https://codecov.io/gh/libcell/phyloR)
-[![phyloR](https://img.shields.io/badge/phyloR-0.1.0-purple.svg)](https://github.com/libcell/phyloR)
+[![Coverage: 100%](https://img.shields.io/badge/codecov-100%25-brightreegn.svg)](https://codecov.io/gh/libcell/phyloPipeR)
+[![phyloPipeR](https://img.shields.io/badge/phyloPipeR-0.1.0-purple.svg)](https://github.com/libcell/phyloPipeR)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
 
 ## Phylogenetic Analysis Toolkit for R
 
-**phyloR** provides an integrated workflow for molecular phylogenetics, from sequence retrieval to tree comparison. Key features include:
+**phyloPipeR** provides an integrated workflow for molecular phylogenetics, from sequence retrieval to tree comparison. Key features include:
 
 - 🧬 Ortholog identification from major databases
 - 🔍 Multiple sequence alignment and trimming
@@ -31,14 +31,14 @@
 ``` r
 # Install via remotes (recommended), or devtools
 if (!require("remotes")) install.packages("remotes")
-remotes::install_github("libcell/phyloR", dependencies = TRUE)
+remotes::install_github("libcell/phyloPipeR", dependencies = TRUE)
 ```
 
-### Alternatively, using **install_ciblab()** to install phyloR from CibLab repository 
+### Alternatively, using **install_ciblab()** to install phyloPipeR from CibLab repository 
 
 ``` r
 source("https://ciblab.net/pub/install_ciblab.R")
-install_ciblab("phyloR")
+install_ciblab("phyloPipeR")
 ```
 
 ## Quick Start

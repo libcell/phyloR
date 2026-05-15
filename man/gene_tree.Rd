@@ -8,54 +8,73 @@ gene_tree(
   seq.file,
   seq.type = "DNA",
   tree_method = "NJ",
-  root = NULL,
+  model = NULL,
   show_tree = TRUE
 )
 }
 \arguments{
 \item{seq.file}{A string specifying the path to the sequence file (FASTA format).}
 
-\item{seq.type}{A string specifying the type of sequences in the file. Options are "DNA" or "protein". Default is "DNA".}
+\item{seq.type}{A string specifying the type of sequences. Options: "DNA" or "protein". Default "DNA".}
 
-\item{tree_method}{A string specifying the tree construction method. Options include:
-"NJ" (Neighbor-Joining), "MP" (Maximum-Parsimony), "ML" (Maximum-Likelihood), "UPGMA", "BI" (Bayesian-Inference).
-Default is "NJ".}
+\item{tree_method}{Tree construction method. Options: "NJ" (Neighbor-Joining),
+"MP" (Maximum-Parsimony), "ML" (Maximum-Likelihood), "UPGMA", "BI" (Bayesian-Inference).
+Default "NJ".}
 
-\item{root}{Character string or NULL, specify outgroup for rooting. If NULL, automatic outgroup selection is performed}
+\item{model}{Character string specifying the evolutionary model. If NULL, defaults:
+\itemize{
+\item For NJ/UPGMA with DNA: "K80"
+\item For ML with DNA: automatically tests all available models and selects the best
+\item For ML with protein: automatically tests all available models and selects the best
+\item For BI with DNA: "JC69"
+\item For NJ/UPGMA with protein: no model selection available
+\item For MP: no model selection available
+}}
 
-\item{show_tree}{Logical, if TRUE the constructed phylogenetic tree is displayed. Default is TRUE.}
+\item{show_tree}{Logical, whether to plot the tree. Default TRUE.}
 }
 \value{
-A phylogenetic tree object of class \code{phylo} representing the tree constructed using the selected method.
-If \code{show_tree} is TRUE, the tree is plotted with bootstrap support values.
+A phylogenetic tree object of class \code{phylo} (UNROOTED). The tree should be rooted
+before further analysis using \code{ape::root()} (for outgroup rooting) or
+\code{phangorn::midpoint()} (for midpoint rooting).
 }
 \description{
-It generates a phylogenetic tree from sequence data using various tree construction methods,
-including Neighbor-Joining (NJ), Maximum-Parsimony (MP), Maximum-Likelihood (ML), Unweighted Pair Group
-Method with Arithmetic Mean (UPGMA), and Bayesian-Inference (BI). It supports both DNA and protein
-sequences and allows for bootstrapping and tree visualization.
+This function generates a phylogenetic tree from sequence data using various construction methods.
+\strong{Important}: The function returns an UNROOTED tree. Users MUST root the tree manually using
+\code{ape::root()} (outgroup rooting, recommended) or \code{phangorn::midpoint()} (midpoint rooting)
+before biological interpretation.
 }
 \details{
-The function supports the following tree construction methods:
+Supported methods:
 \itemize{
-\item \strong{Neighbor-Joining (NJ)}: Constructs a tree using the NJ algorithm, with options for DNA or protein sequences.
-\item \strong{Maximum-Parsimony (MP)}: Uses the MP algorithm for tree construction with parsimony optimization.
-\item \strong{Maximum-Likelihood (ML)}: Implements ML-based tree construction, including model selection and bootstrapping.
-\item \strong{Unweighted Pair Group Method with Arithmetic Mean (UPGMA)}: Generates a UPGMA tree based on pairwise distances.
-\item \strong{Bayesian-Inference (BI)}: Constructs a Bayesian phylogenetic tree using BEAST2 and supports posterior probabilities.
+\item \strong{NJ}: Neighbor-Joining, distance-based, fast. Suitable for large datasets.
+\item \strong{MP}: Maximum-Parsimony, uses parsimony ratchet algorithm. Finds the tree with
+the minimum number of evolutionary changes.
+\item \strong{ML}: Maximum-Likelihood, includes automatic model selection. Generally the most
+accurate but computationally intensive.
+\item \strong{UPGMA}: Hierarchical clustering based on distances. Assumes molecular clock.
+\item \strong{BI}: Bayesian Inference using BEAST2 (DNA only). Provides posterior probabilities
+for clade support.
 }
 }
 \examples{
 # Example of constructing trees using different methods from a DNA sequence file
-DNA_seq <- system.file("extdata", "DNA_seq.fas", package = "phyloR")
+DNA_seq <- system.file("extdata", "DNA_seq.fas", package = "phyloPipeR")
 tree1 <- gene_tree(seq.file = DNA_seq,
                    seq.type = "DNA",
                    tree_method = "UPGMA")
 
 # Example of constructing trees using different methods from a protein sequence file
-protein_seq <- system.file("extdata", "protein_seq.fas", package = "phyloR")
+protein_seq <- system.file("extdata", "protein_seq.fas", package = "phyloPipeR")
 tree2 <- gene_tree(seq.file = protein_seq,
                    seq.type = "protein",
                    tree_method = "UPGMA")
+
+# Example with NJ method and custom model
+tree3 <- gene_tree(seq.file = DNA_seq,
+                   seq.type = "DNA",
+                   tree_method = "NJ",
+                   model = "TN93")
+
 
 }

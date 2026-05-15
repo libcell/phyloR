@@ -9,6 +9,7 @@ concat_tree(
   data_dir = NULL,
   seq.type = "DNA",
   tree_method = "ML",
+  model = NULL,
   show_tree = TRUE
 )
 }
@@ -24,6 +25,12 @@ Default is "DNA".}
 \item{tree_method}{The method for constructing the phylogenetic tree. Options include:
 "ML" (Maximum Likelihood), "NJ" (Neighbor Joining), "UPGMA", "MP" (Maximum Parsimony),
 and "BI" (Bayesian Inference). Default is "ML".}
+
+\item{model}{The evolutionary model to use for tree construction. For DNA sequences with ML method,
+options include "all", "JC", "F81", "K80", "HKY", "SYM", "GTR". For DNA sequences with NJ/UPGMA,
+options include "raw", "N", "TS", "TV", "JC69", "K80", "F81", "K81", "F84", "BH87", "T92",
+"TN93", "GG95", "logdet", "paralin", "indel", "indelblock". For protein sequences with ML method,
+options include "all", "JTT", "WAG", "LG". Default is NULL (auto-selected).}
 
 \item{show_tree}{Logical, if TRUE the constructed supertree is displayed. Default is TRUE.}
 }
@@ -50,16 +57,18 @@ or AAbin format depending on the sequence type.
 }
 }
 \examples{
+\dontrun{
 dna <- c("K01939", "K03644", "K00797", "K00927", "K00088", "K02257", "K00164",
          "K00820", "K06158", "K00008")
-data_dir <- system.file("extdata", "sequences", package = "phyloR")
-tree1 <- concat_tree(seq.file = dna,
+data_dir <- system.file("extdata", "sequences", package = "phyloPipeR")
+tree1 <- concat_tree(seq.files = dna,
                      seq.type = "DNA",
                      data_dir = data_dir,
                      tree_method = "NJ")
-tree2 <- concat_tree(seq.file = dna,
+tree2 <- concat_tree(seq.files = dna,
                      seq.type = "DNA",
                      data_dir = data_dir,
                      tree_method = "UPGMA")
+}
 
 }

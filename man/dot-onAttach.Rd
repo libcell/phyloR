@@ -2,7 +2,7 @@
 % Please edit documentation in R/zzz.R
 \name{.onAttach}
 \alias{.onAttach}
-\title{.onAttach function for the 'phyloR' package}
+\title{.onAttach function for the 'phyloPipeR' package}
 \usage{
 .onAttach(libname, pkgname)
 }
@@ -12,7 +12,7 @@
 \item{pkgname}{Character string; the package name.}
 }
 \description{
-It is executed when the 'phyloR' package is loaded. It checks if the 'crayon' package
+It is executed when the 'phyloPipeR' package is loaded. It checks if the 'crayon' package
 is available to display a colorful welcome message. If 'crayon' is not found, a simpler message
 is shown.
 }

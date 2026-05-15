@@ -13,8 +13,17 @@
 #'        default is "scientificname".
 #' @param seq.type The type of sequence to be retrieved, default is "DNA".
 #'        Other options may include "protein".
+#'        Options are "ClustalW" (default), "Muscle", or "ClustalOmega".
+#' @param gapOpening The penalty for opening a gap in the alignment.
+#'        Default is "default", which uses algorithm-specific default values.
+#' @param gapExtension The penalty for extending an existing gap.
+#'        Default is "default", which uses algorithm-specific default values.
+#' @param maxiters The maximum number of refinement iterations.
+#'        Default is "default", which uses algorithm-specific default values.
+#' @param gap.end Fraction of gaps tolerated at the ends of the alignment (0-1). Default is 0.5.
+#' @param gap.mid Fraction of gaps tolerated inside the alignment (0-1). Default is 0.9.
 #' @param align_method The alignment method to be used, default is "ClustalW".
-#'        Options are "ClustalW", "Muscle", "Mafft" or "T-coffee". Default is "ClustalW".
+#'        Options are "ClustalW", "Muscle" or "ClustalOmega". Default is "ClustalW".
 #' @param tree_method The method for constructing the phylogenetic tree. Options include:
 #'        "ML" (Maximum Likelihood), "NJ" (Neighbor Joining), "UPGMA", "MP" (Maximum Parsimony),
 #'        and "BI" (Bayesian Inference). Default is "ML".
@@ -30,18 +39,26 @@
 #'   4. Optionally displays the constructed tree.
 #'   5. Cleans up temporary files and restores the original working directory.
 #'
+#' @importFrom KEGGREST keggGet
+#' @importFrom rentrez entrez_summary
+#' @importFrom pbapply pblapply
+#' @importFrom KEGGREST keggGet
+#' @importFrom rentrez entrez_summary
+#' @importFrom msa msa msaConvert
+#' @importFrom microseq readFasta msaTrim writeFasta
+#' @importFrom bios2mds export.fasta
+#' @importFrom Biostrings readDNAStringSet readAAStringSet
+#' @importFrom ape dist.dna njs dist.aa di2multi prop.clades root is.rooted keep.tip as.AAbin
 #' @importFrom adegenet fasta2DNAbin
-#' @importFrom ape dist.dna dist.aa nj di2multi prop.clades as.DNAbin as.AAbin
-#' @importFrom phangorn as.phyDat modelTest pml_bb upgma pratchet acctran
-#' @importFrom methods new
-#' @importFrom apex concatenate
+#' @importFrom phangorn as.phyDat pratchet acctran modelTest pml_bb upgma midpoint read.phyDat
 #' @importFrom babette bbt_run_from_model
-#' @importFrom beautier create_inference_model
+#' @importFrom beautier create_inference_model create_jc69_site_model create_hky_site_model
+#'             create_tn93_site_model create_gtr_site_model
 #' @importFrom beastier create_beast2_options
-#' @importFrom beastierinstall install_beast2
-#' @importFrom seqinr write.fasta
+#' @importFrom tools file_ext
 #'
 #' @examples
+#' \dontrun{
 #' tree <- concat_tree_fetch(gene_ids = c("K00820", "K00088", "K00927",
 #'                                        "K06158", "K00008","K00164",
 #'                                        "K00797", "K01939", "K02257",
@@ -54,6 +71,7 @@
 #'                           species.type = "abbspname",
 #'                           seq.type = "DNA",
 #'                           tree_method = "UPGMA")
+#' }
 #'
 #'
 #' @export
@@ -63,7 +81,13 @@ concat_tree_fetch <- function(gene_ids,
                               species.type = "scientificname",
                               seq.type = "DNA",
                               align_method = "ClustalW",
+                              gapOpening = "default",
+                              gapExtension = "default",
+                              maxiters = "default",
+                              gap.end = 0.5,
+                              gap.mid = 0.9,
                               tree_method = "NJ",
+                              model = NULL,
                               show_tree = TRUE){
 
   # Create a new directory for sequences files
@@ -125,6 +149,11 @@ concat_tree_fetch <- function(gene_ids,
     processed_seq <- align_trim(seq.file = file.out,
                                 seq.type = seq.type,
                                 method = align_method,
+                                gapOpening = gapOpening,
+                                gapExtension = gapExtension,
+                                maxiters = maxiters,
+                                gap.end = gap.end,
+                                gap.mid = gap.mid,
                                 output_file = output_path)
 
     # Remove the temporary sequences file
@@ -140,6 +169,7 @@ concat_tree_fetch <- function(gene_ids,
                       seq.type = seq.type,
                       data_dir = temp_dir,
                       tree_method = tree_method,
+                      model = model,
                       show_tree = show_tree)
   return(tree)
 
