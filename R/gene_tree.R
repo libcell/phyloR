@@ -47,7 +47,6 @@
 #' @importFrom tools file_ext
 #'
 #' @examples
-#' \dontrun{
 #' # Example of constructing trees using different methods from a DNA sequence file
 #' DNA_seq <- system.file("extdata", "DNA_seq.fas", package = "phyloPipeR")
 #' tree1 <- gene_tree(seq.file = DNA_seq,
@@ -65,11 +64,7 @@
 #'                    seq.type = "DNA",
 #'                    tree_method = "NJ",
 #'                    model = "TN93")
-<<<<<<< HEAD
 #'
-=======
-#' }
->>>>>>> de5479720c41e1ee0be4871eadddd95ce81b3d29
 #'
 #' @export
 gene_tree <- function(seq.file,

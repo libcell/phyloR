@@ -57,7 +57,7 @@
 #'
 #' # Align and trim protein sequences
 #' protein_seq <- system.file("extdata", "protein_sequences.fas", package = "phyloPipeR")
-#' align_trim(protein_file,
+#' align_trim(protein_seq,
 #'            seq.type = "PROTEIN",
 #'            method = "Muscle",
 #'            gap.end = 0.3,

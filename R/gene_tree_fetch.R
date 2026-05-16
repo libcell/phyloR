@@ -26,7 +26,15 @@
 #' @param tree_method The method for constructing the phylogenetic tree. Options include:
 #'        "ML" (Maximum Likelihood), "NJ" (Neighbor Joining), "UPGMA", "MP" (Maximum Parsimony),
 #'        and "BI" (Bayesian Inference). Default is "ML".
-#' @param root Character string or NULL, specify outgroup for rooting. If NULL, automatic outgroup selection is performed
+#' @param model Character string specifying the evolutionary model. If NULL, defaults:
+#'        \itemize{
+#'          \item For NJ/UPGMA with DNA: "K80"
+#'          \item For ML with DNA: automatically tests all available models and selects the best
+#'          \item For ML with protein: automatically tests all available models and selects the best
+#'          \item For BI with DNA: "JC69"
+#'          \item For NJ/UPGMA with protein: no model selection available
+#'          \item For MP: no model selection available
+#'        }
 #' @param show_tree Logical, if TRUE the constructed tree is displayed using a suitable tree plotting method.
 #'        Default is TRUE.
 #'

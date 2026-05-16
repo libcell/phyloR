@@ -56,6 +56,16 @@ Default is "default", which uses algorithm-specific default values.}
 "ML" (Maximum Likelihood), "NJ" (Neighbor Joining), "UPGMA", "MP" (Maximum Parsimony),
 and "BI" (Bayesian Inference). Default is "ML".}
 
+\item{model}{Character string specifying the evolutionary model. If NULL, defaults:
+\itemize{
+\item For NJ/UPGMA with DNA: "K80"
+\item For ML with DNA: automatically tests all available models and selects the best
+\item For ML with protein: automatically tests all available models and selects the best
+\item For BI with DNA: "JC69"
+\item For NJ/UPGMA with protein: no model selection available
+\item For MP: no model selection available
+}}
+
 \item{show_tree}{Logical, if TRUE the constructed tree is displayed using a suitable tree plotting method.
 Default is TRUE.}
 }
